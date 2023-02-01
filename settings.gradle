@@ -14,3 +14,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "cherry-common"
 include ':app'
+include ':core'
+include ':domain'
+include ':data'

@@ -1,0 +1,29 @@
+package doro.android.core.util
+
+import javax.inject.Inject
+
+class UserHolder @Inject constructor(
+    private val prefUtil: PrefUtil
+) {
+    fun setUser(userId: Int, token: String?) {
+        prefUtil.setString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_ID, userId.toString())
+        prefUtil.setString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_TOKEN, token)
+
+    }
+
+    fun getUserId(): Int {
+        return Integer.parseInt(prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_ID) ?: "-1")
+    }
+
+    fun getToken(): String? {
+        return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_TOKEN)
+    }
+
+    fun hasSession(): Boolean {
+        return getUserId() != -1
+    }
+
+    fun clearUser(){
+        prefUtil.remove(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_ID)
+    }
+}
