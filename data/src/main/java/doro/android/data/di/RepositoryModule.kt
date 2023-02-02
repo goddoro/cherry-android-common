@@ -4,6 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import doro.android.data.dto.FcmPushRepositoryImpl
 import doro.android.data.repository.*
 import doro.android.domain.repository.*
 
@@ -50,4 +51,9 @@ abstract class RepositoryModule {
     abstract fun bindAgentRepository(
         bindAgentRepositoryImpl: AgentRepositoryImpl
     ): AgentRepository
+
+    @Binds
+    abstract fun bindFcmPushRepository(
+        fcmPushRepositoryImpl: FcmPushRepositoryImpl
+    ): FcmPushRepository
 }
