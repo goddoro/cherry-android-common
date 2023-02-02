@@ -1,11 +1,11 @@
-package doro.android.data.dto
+package doro.android.domain.response
 
 import android.content.Context
 import android.os.Parcelable
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import doro.android.data.R
+import doro.android.domain.R
 import kotlinx.parcelize.Parcelize
 import retrofit2.HttpException
 
