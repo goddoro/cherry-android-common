@@ -2,11 +2,10 @@ package doro.android.core.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class PrefUtil @Inject constructor(
-    @ApplicationContext val context: Context
+    val context: Context
 ) {
 
     private fun getSharedPreferences(
