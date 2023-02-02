@@ -12,5 +12,6 @@ enum class ButtonType {
     LINE,
     START,
     AUTO_START,
+    TOP
 }
 
