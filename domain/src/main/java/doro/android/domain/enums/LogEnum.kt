@@ -6,7 +6,7 @@ enum class CherryUI {
 }
 
 enum class CherryAction {
-    enter, clicked, ping
+    visited, clicked, ping
 }
 
 

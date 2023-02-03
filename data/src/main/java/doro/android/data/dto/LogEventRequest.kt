@@ -8,8 +8,8 @@ import kotlinx.parcelize.Parcelize
 data class LogEventRequest(
     @SerializedName("player")
     val playerId: Int,
-    @SerializedName("ui")
-    val ui: CherryUI,
+    @SerializedName("where")
+    val where: CherryUI,
     @SerializedName("action")
     val action: CherryAction,
     @SerializedName("data")

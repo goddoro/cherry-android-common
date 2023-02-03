@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Column {
                 LaunchedEffect(Unit){
-                    logRepository.sendEnterEvent(CherryUI.game)
+                    logRepository.sendVisitEvent(CherryUI.game)
                 }
                 Text(text = "HELLO TESTER")
                 Box(

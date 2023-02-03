@@ -11,5 +11,5 @@ interface LogRepository {
         point: Int,
         gameName: String,
     )
-    suspend fun sendEnterEvent(where: CherryUI)
+    suspend fun sendVisitEvent(where: CherryUI)
 }

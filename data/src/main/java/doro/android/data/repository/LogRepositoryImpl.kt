@@ -21,7 +21,7 @@ class LogRepositoryImpl @Inject constructor(
             val request = LogEventRequest(
                 playerId = userHolder.getUserId(),
                 action = CherryAction.clicked,
-                ui = where,
+                where = where,
                 data = data,
             )
             logService.sendEvent(request)
@@ -36,7 +36,7 @@ class LogRepositoryImpl @Inject constructor(
         val request = LogEventRequest(
             playerId = userHolder.getUserId(),
             action = CherryAction.ping,
-            ui = CherryUI.game,
+            where = CherryUI.game,
             data = GamePingData(
                 machineNumber = machineNumber,
                 credit = credit,
@@ -47,11 +47,11 @@ class LogRepositoryImpl @Inject constructor(
         logService.sendEvent(request)
     }
 
-    override suspend fun sendEnterEvent(where: CherryUI) = withContext(Dispatchers.IO) {
+    override suspend fun sendVisitEvent(where: CherryUI) = withContext(Dispatchers.IO) {
         val request = LogEventRequest(
             playerId = userHolder.getUserId(),
-            action = CherryAction.enter,
-            ui = where,
+            action = CherryAction.visited,
+            where = where,
         )
         logService.sendEvent(request)
     }
