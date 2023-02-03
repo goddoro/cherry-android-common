@@ -4,9 +4,9 @@ import doro.android.core.util.UserHolder
 import doro.android.data.dto.GamePingData
 import doro.android.data.dto.LogEventRequest
 import doro.android.data.service.LogService
-import doro.android.domain.enum.CherryAction
-import doro.android.domain.enum.CherryActionData
-import doro.android.domain.enum.CherryUI
+import doro.android.domain.enums.CherryAction
+import doro.android.domain.enums.CherryActionData
+import doro.android.domain.enums.CherryUI
 import doro.android.domain.repository.LogRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

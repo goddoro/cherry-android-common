@@ -60,7 +60,7 @@ class ApiModule {
 
     @Singleton
     @Provides
-    fun provideLogService(@Named(LOG_NAMED) retrofit: Retrofit) =
+    fun provideLogService(@Named(LOG_NAMED) retrofit: Retrofit): LogService =
         retrofit.create(LogService::class.java)
 
 }

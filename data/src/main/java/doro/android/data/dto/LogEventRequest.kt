@@ -2,7 +2,7 @@ package doro.android.data.dto
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import doro.android.domain.enum.*
+import doro.android.domain.enums.*
 import kotlinx.parcelize.Parcelize
 
 data class LogEventRequest(
@@ -15,10 +15,6 @@ data class LogEventRequest(
     @SerializedName("data")
     val data: CherryActionData? = null
 )
-
-
-
-
 
 @Parcelize
 data class ButtonClickData(

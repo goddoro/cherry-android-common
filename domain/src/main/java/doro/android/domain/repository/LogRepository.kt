@@ -1,7 +1,7 @@
 package doro.android.domain.repository
 
-import doro.android.domain.enum.CherryActionData
-import doro.android.domain.enum.CherryUI
+import doro.android.domain.enums.CherryActionData
+import doro.android.domain.enums.CherryUI
 
 interface LogRepository {
     suspend fun sendClickEvent(where: CherryUI, data: CherryActionData? = null)

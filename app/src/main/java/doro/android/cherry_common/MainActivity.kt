@@ -11,20 +11,29 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import dagger.hilt.android.AndroidEntryPoint
+import doro.android.domain.enums.CherryUI
+import doro.android.domain.repository.LogRepository
 import doro.cherry.rtsp.player.widget.RtspSurfaceView
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var logRepository: LogRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             Column {
+                LaunchedEffect(Unit){
+                    logRepository.sendEnterEvent(CherryUI.game)
+                }
                 Text(text = "HELLO TESTER")
                 Box(
                     modifier = Modifier.fillMaxWidth()

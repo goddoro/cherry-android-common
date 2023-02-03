@@ -1,4 +1,4 @@
-package doro.android.domain.enum
+package doro.android.domain.enums
 
 
 enum class CherryUI {
