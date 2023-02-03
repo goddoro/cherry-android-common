@@ -7,7 +7,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import doro.android.core.BuildConfig
 import doro.android.core.util.UserHolder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -16,7 +15,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
+const val LOG_NAMED = "LOG_NAMED"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -26,24 +27,35 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideOkHttpClient(userHolder: UserHolder, @ApplicationContext context: Context) =
-        if (BuildConfig.DEBUG) {
-            val loggingInterceptor = HttpLoggingInterceptor()
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-            OkHttpClient.Builder()
-                .addInterceptor(loggingInterceptor)
-        } else {
-            OkHttpClient.Builder()
-        }
+    fun provideOkHttpClient(
+        userHolder: UserHolder,
+        @ApplicationContext context: Context
+    ): OkHttpClient {
+
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+        return OkHttpClient.Builder()
             .addInterceptor(CherryInterceptor(userHolder, context))
             .build()
+    }
 
     @Singleton
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideCherryRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl(baseUrl)
+            .baseUrl("http://15.165.196.152:3000/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @Named(LOG_NAMED)
+    fun provideLogRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("http://13.124.181.184:3000/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

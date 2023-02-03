@@ -57,4 +57,9 @@ abstract class RepositoryModule {
     abstract fun bindFcmPushRepository(
         fcmPushRepositoryImpl: FcmPushRepositoryImpl
     ): FcmPushRepository
+
+    @Binds
+    abstract fun bindLogRepository(
+        logRepositoryImpl: LogRepositoryImpl
+    ): LogRepository
 }

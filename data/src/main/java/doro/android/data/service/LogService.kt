@@ -1,0 +1,10 @@
+package doro.android.data.service
+
+import doro.android.data.dto.LogEventRequest
+import retrofit2.http.Body
+import retrofit2.http.POST
+
+interface LogService {
+    @POST("/logger")
+    fun sendEvent(@Body log: LogEventRequest)
+}

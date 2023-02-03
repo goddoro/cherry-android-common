@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import doro.android.data.service.*
 import retrofit2.Retrofit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -56,4 +57,10 @@ class ApiModule {
     @Provides
     fun provideFcmPushService(retrofit: Retrofit): FcmPushService =
         retrofit.create(FcmPushService::class.java)
+
+    @Singleton
+    @Provides
+    fun provideLogService(@Named(LOG_NAMED) retrofit: Retrofit) =
+        retrofit.create(LogService::class.java)
+
 }
