@@ -2,7 +2,7 @@ package doro.android.domain.enums
 
 
 enum class CherryUI {
-    home, profile, notification, setting, game, login, sign_up, reset_password, point_change, splash
+    home, profile, notification, setting, game, login, sign_up, reset_password, point_exchange, splash
 }
 
 enum class CherryAction {
