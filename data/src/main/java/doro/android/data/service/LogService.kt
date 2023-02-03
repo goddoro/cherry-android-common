@@ -6,5 +6,5 @@ import retrofit2.http.POST
 
 interface LogService {
     @POST("/logger")
-    fun sendEvent(@Body log: LogEventRequest)
+    suspend fun sendEvent(@Body log: LogEventRequest)
 }
