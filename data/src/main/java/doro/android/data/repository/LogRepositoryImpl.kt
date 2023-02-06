@@ -1,6 +1,7 @@
 package doro.android.data.repository
 
 import doro.android.core.util.UserHolder
+import doro.android.data.dto.CherryLogEventRequest
 import doro.android.data.dto.GamePingData
 import doro.android.data.dto.LogEventRequest
 import doro.android.data.service.LogService
@@ -24,7 +25,7 @@ class LogRepositoryImpl @Inject constructor(
                 where = where,
                 data = data,
             )
-            logService.sendEvent(request)
+            logService.sendEvent(CherryLogEventRequest(request))
         }
 
     override suspend fun sendPingEvent(
@@ -44,7 +45,7 @@ class LogRepositoryImpl @Inject constructor(
                 gameName = gameName,
             ),
         )
-        logService.sendEvent(request)
+        logService.sendEvent(CherryLogEventRequest(request))
     }
 
     override suspend fun sendVisitEvent(where: CherryUI) = withContext(Dispatchers.IO) {
@@ -53,6 +54,6 @@ class LogRepositoryImpl @Inject constructor(
             action = CherryAction.visited,
             where = where,
         )
-        logService.sendEvent(request)
+        logService.sendEvent(CherryLogEventRequest(request))
     }
 }
