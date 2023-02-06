@@ -6,6 +6,7 @@ import doro.android.data.dto.*
 import doro.android.data.service.LogService
 import doro.android.domain.enums.CherryAction
 import doro.android.domain.enums.CherryActionData
+import doro.android.domain.enums.CherryButtonEvent
 import doro.android.domain.enums.CherryUI
 import doro.android.domain.repository.LogRepository
 import kotlinx.coroutines.Dispatchers
@@ -16,13 +17,13 @@ class LogRepositoryImpl @Inject constructor(
     private val logService: LogService,
     private val userHolder: UserHolder,
 ) : LogRepository {
-    override suspend fun sendClickEvent(where: CherryUI, data: CherryActionData?) =
+    override suspend fun sendClickEvent(where: CherryUI, name: CherryButtonEvent) =
         withContext(Dispatchers.IO) {
             val request = LogEventRequest(
                 playerId = userHolder.getUserId(),
                 action = CherryAction.clicked,
                 where = where,
-                data = data,
+                data = ButtonClickData(name = name),
             )
             logService.sendEvent(CherryLogEventRequest(request))
         }
@@ -61,7 +62,6 @@ class LogRepositoryImpl @Inject constructor(
             playerId = userHolder.getUserId(),
             message = message,
         )
-        Log.d("OKhttp", "GOGO")
         logService.sendStreamingEvent(CherryStreamingLogEventRequest(request))
     }
 }
