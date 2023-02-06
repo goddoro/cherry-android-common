@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.util.Log
+import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import doro.cherry.rtsp.player.RtspClient
@@ -29,13 +30,16 @@ open class RtspSurfaceView: SurfaceView {
     private var requestVideo = true
     private var requestAudio = true
     private var rtspThread: RtspThread? = null
-    private var videoFrameQueue = FrameQueue(60)
+    private var videoFrameQueue = FrameQueue(60) {
+        onBufferMax()
+    }
     private var audioFrameQueue = FrameQueue(10)
     private var videoDecodeThread: VideoDecodeThread? = null
     private var audioDecodeThread: AudioDecodeThread? = null
-    private var surfaceWidth = 1920
-    private var surfaceHeight = 1080
+    private var surfaceWidth = 960
+    private var surfaceHeight = 540
     private var statusListener: RtspStatusListener? = null
+    private var errorListener: RtspErrorListener?= null
     private val uiHandler = Handler(Looper.getMainLooper())
     private var videoMimeType: String = "video/avc"
     private var audioMimeType: String = ""
@@ -55,6 +59,10 @@ open class RtspSurfaceView: SurfaceView {
         fun onRtspStatusFailedUnauthorized()
         fun onRtspStatusFailed(message: String?)
         fun onRtspFirstFrameRendered()
+    }
+
+    interface RtspErrorListener {
+        fun onBufferMax()
     }
 
     private val proxyClientListener = object: RtspClient.RtspClientListener {
@@ -98,6 +106,7 @@ open class RtspSurfaceView: SurfaceView {
                 audioChannelCount = sdpInfo.audioTrack?.channels!!
                 audioCodecConfig = sdpInfo.audioTrack?.config
             }
+
             uiHandler.post {
                 statusListener?.onRtspStatusConnected()
             }
@@ -136,13 +145,14 @@ open class RtspSurfaceView: SurfaceView {
    private val surfaceCallback = object: SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
             if (DEBUG) Log.v(TAG, "surfaceCreated()")
-            onRtspClientConnected()
+            onRtspClientConnected(holder.surface)
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             if (DEBUG) Log.v(TAG, "surfaceChanged(format=$format, width=$width, height=$height)")
             surfaceWidth = width
             surfaceHeight = height
+
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -243,12 +253,17 @@ open class RtspSurfaceView: SurfaceView {
         this.statusListener = listener
     }
 
+    fun setErrorListener(listener: RtspErrorListener){
+        if (DEBUG) Log.v(TAG, "setErrorListener")
+        this.errorListener = listener
+    }
+
     private fun onRtspClientStarted() {
         if (DEBUG) Log.v(TAG, "onRtspClientStarted()")
         uiHandler.post { statusListener?.onRtspStatusConnected() }
     }
 
-    private fun onRtspClientConnected() {
+    private fun onRtspClientConnected(surface: Surface) {
         if (DEBUG) Log.v(TAG, "onRtspClientConnected()")
         if (videoMimeType.isNotEmpty()) {
             firstFrameRendered = false
@@ -259,7 +274,7 @@ open class RtspSurfaceView: SurfaceView {
                 }
             Log.i(TAG, "Starting video decoder with mime type \"$videoMimeType\"")
             videoDecodeThread = VideoDecodeThread(
-                holder.surface, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener)
+                surface, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener)
             videoDecodeThread!!.name = "RTSP video thread [${getUriName()}]"
             videoDecodeThread!!.start()
         }
@@ -290,6 +305,10 @@ open class RtspSurfaceView: SurfaceView {
     private fun getUriName(): String {
         val port = if (uri.port == -1) DEFAULT_RTSP_PORT else uri.port
         return "${uri.host.toString()}:$port"
+    }
+
+    private fun onBufferMax(){
+        errorListener?.onBufferMax()
     }
 
     companion object {

@@ -6,6 +6,7 @@ import android.media.MediaFormat
 import android.util.Log
 import android.view.Surface
 import com.google.android.exoplayer2.util.Util
+import doro.cherry.rtsp.player.widget.RtspSurfaceView
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -15,7 +16,8 @@ class VideoDecodeThread (
     private val width: Int,
     private val height: Int,
     private val videoFrameQueue: FrameQueue,
-    private val onFrameRenderedListener: OnFrameRenderedListener) : Thread() {
+    private val onFrameRenderedListener: OnFrameRenderedListener,
+) : Thread() {
 
     private var exitFlag: AtomicBoolean = AtomicBoolean(false)
 
@@ -49,27 +51,29 @@ class VideoDecodeThread (
 
             decoder.setOnFrameRenderedListener(onFrameRenderedListener, null)
 
-            if (DEBUG) Log.d(TAG, "Configuring surface ${widthHeight.first}x${widthHeight.second} w/ '$mimeType', max instances: ${decoder.codecInfo.getCapabilitiesForType(mimeType).maxSupportedInstances}")
+            if (DEBUG) Log.d(
+                TAG,
+                "Configuring surface ${widthHeight.first}x${widthHeight.second} w/ '$mimeType', max instances: ${
+                    decoder.codecInfo.getCapabilitiesForType(mimeType).maxSupportedInstances
+                }"
+            )
             decoder.configure(format, surface, null, 0)
 
             // TODO: add scale option (ie: FIT, SCALE_CROP, SCALE_NO_CROP)
             //decoder.setVideoScalingMode(MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
 
             decoder.start()
-            if (DEBUG) Log.d(TAG, "Started surface decoder")
 
             val bufferInfo = MediaCodec.BufferInfo()
 
             // Main loop
             while (!exitFlag.get()) {
                 val inIndex: Int = decoder.dequeueInputBuffer(10000L)
+                if (DEBUG) Log.d(TAG, "inIndex = $inIndex")
                 if (inIndex >= 0) {
                     // fill inputBuffers[inputBufferIndex] with valid data
                     val byteBuffer: ByteBuffer? = decoder.getInputBuffer(inIndex)
                     byteBuffer?.rewind()
-
-                    // Preventing BufferOverflowException
-                    // if (length > byteBuffer.limit()) throw DecoderFatalException("Error")
 
                     val frame = videoFrameQueue.pop()
                     if (frame == null) {
@@ -81,16 +85,25 @@ class VideoDecodeThread (
                         decoder.queueInputBuffer(inIndex, frame.offset, frame.length, frame.timestamp, 0)
                     }
                 }
-
                 if (exitFlag.get()) break
                 when (val outIndex = decoder.dequeueOutputBuffer(bufferInfo, 10000L)) {
-                    MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> Log.d(TAG, "Decoder format changed: ${decoder.outputFormat}")
-                    MediaCodec.INFO_TRY_AGAIN_LATER -> if (DEBUG) Log.d(TAG, "No output from decoder available")
+                    MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> Log.d(
+                        TAG,
+                        "Decoder format changed: ${decoder.outputFormat}"
+                    )
+                    MediaCodec.INFO_TRY_AGAIN_LATER -> if (DEBUG) Log.d(
+                        TAG, "No output from decoder available"
+                    )
                     else -> {
-                        if (outIndex >= 0)
-                            decoder.releaseOutputBuffer(outIndex, bufferInfo.size != 0 && !exitFlag.get())
+                        if (outIndex >= 0) {
+                            decoder.releaseOutputBuffer(
+                                outIndex,
+                                bufferInfo.size != 0 && !exitFlag.get()
+                            )
+                        }
                     }
                 }
+
 
                 // All decoded frames have been rendered, we can stop playing now
                 if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {

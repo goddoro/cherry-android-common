@@ -1,11 +1,12 @@
 package doro.cherry.rtsp.player.codec
 
 import android.util.Log
+import doro.cherry.rtsp.player.widget.RtspSurfaceView
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.TimeUnit
 
-class FrameQueue(frameQueueSize: Int) {
+class FrameQueue(frameQueueSize: Int, val onBufferMax: () -> Unit = {}) {
 
     data class Frame (
         val data: ByteArray,
@@ -15,11 +16,16 @@ class FrameQueue(frameQueueSize: Int) {
     )
 
     private val queue: BlockingQueue<Frame> = ArrayBlockingQueue(frameQueueSize)
+    private var errorOccurred = false
 
     @Throws(InterruptedException::class)
     fun push(frame: Frame): Boolean {
         if (queue.offer(frame, 5, TimeUnit.MILLISECONDS)) {
             return true
+        }
+        if (!errorOccurred) {
+            onBufferMax()
+            errorOccurred = true
         }
         Log.w(TAG, "Cannot add frame, queue is full")
         return false
