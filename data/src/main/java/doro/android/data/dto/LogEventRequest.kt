@@ -12,6 +12,22 @@ data class CherryLogEventRequest(
 ): Parcelable
 
 @Parcelize
+data class CherryStreamingLogEventRequest(
+    @SerializedName("log")
+    val log: CherryStreamingLogEvent
+): Parcelable
+
+@Parcelize
+data class CherryStreamingLogEvent(
+    @SerializedName("player")
+    val playerId: Int,
+    @SerializedName("message")
+    val message: String,
+    @SerializedName("type")
+    val type: String = "captured_video",
+): Parcelable
+
+@Parcelize
 data class LogEventRequest(
     @SerializedName("player")
     val playerId: Int,

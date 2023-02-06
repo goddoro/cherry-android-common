@@ -12,4 +12,5 @@ interface LogRepository {
         gameName: String,
     )
     suspend fun sendVisitEvent(where: CherryUI)
+    suspend fun sendStreamingBugEvent(message: String)
 }

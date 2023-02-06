@@ -1,9 +1,8 @@
 package doro.android.data.repository
 
+import android.util.Log
 import doro.android.core.util.UserHolder
-import doro.android.data.dto.CherryLogEventRequest
-import doro.android.data.dto.GamePingData
-import doro.android.data.dto.LogEventRequest
+import doro.android.data.dto.*
 import doro.android.data.service.LogService
 import doro.android.domain.enums.CherryAction
 import doro.android.domain.enums.CherryActionData
@@ -55,5 +54,14 @@ class LogRepositoryImpl @Inject constructor(
             where = where,
         )
         logService.sendEvent(CherryLogEventRequest(request))
+    }
+
+    override suspend fun sendStreamingBugEvent(message: String) = withContext(Dispatchers.IO) {
+        val request = CherryStreamingLogEvent(
+            playerId = userHolder.getUserId(),
+            message = message,
+        )
+        Log.d("OKhttp", "GOGO")
+        logService.sendStreamingEvent(CherryStreamingLogEventRequest(request))
     }
 }
