@@ -28,7 +28,7 @@ class FrameQueue(frameQueueSize: Int) {
     @Throws(InterruptedException::class)
     fun pop(): Frame? {
         try {
-            val frame: Frame? = queue.poll(1000, TimeUnit.MILLISECONDS)
+            val frame: Frame? = queue.poll(100, TimeUnit.MILLISECONDS)
             if (frame == null) {
                 Log.w(TAG, "Cannot get frame, queue is empty")
             }
@@ -43,6 +43,8 @@ class FrameQueue(frameQueueSize: Int) {
     fun clear() {
         queue.clear()
     }
+
+    fun getQueueSize() = queue.size
 
     companion object {
         private val TAG: String = FrameQueue::class.java.simpleName

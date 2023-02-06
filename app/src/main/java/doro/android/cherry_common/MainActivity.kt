@@ -5,44 +5,28 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import dagger.hilt.android.AndroidEntryPoint
-import doro.android.domain.enums.CherryUI
-import doro.android.domain.repository.LogRepository
 import doro.cherry.rtsp.player.widget.RtspSurfaceView
-import javax.inject.Inject
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var logRepository: LogRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            Column {
-                LaunchedEffect(Unit){
-                    logRepository.sendVisitEvent(CherryUI.game)
-                }
-                Text(text = "HELLO TESTER")
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    RtspClientScreen(
-                        videoUrl = "rtsp://admin:Cherry11!\$@61.72.138.120:552/live"
-                    )
-                }
-            }
+            RtspClientScreen(
+                videoUrl = "rtsp://admin:Cherry11!\$@61.72.138.120:552/live"
+            )
         }
     }
 }
@@ -90,12 +74,35 @@ private fun RtspClientScreen(
             })
         }
     }
+    val count = remember { mutableStateOf((0))}
+    val videoQueueSize = remember { mutableStateOf(0)}
+    val audioQueueSize = remember { mutableStateOf(0)}
+    LaunchedEffect(count.value){
+        Log.d("GOOD", videoQueueSize.value.toString())
+        Log.d("GOOD", audioQueueSize.value.toString())
+        videoQueueSize.value = rtspClientView.getVideoFrameQueue().getQueueSize()
+        audioQueueSize.value = rtspClientView.getAudioFrameQueue().getQueueSize()
+        delay(500)
+        count.value = count.value + 1
+    }
     DisposableEffect(
-        AndroidView(
-            modifier = modifier, factory = {
-                rtspClientView
+        Column(
+            modifier = Modifier.background(Color.Yellow)
+        ) {
+            Text(text = "HELLO TESTER1", color = Color.Red)
+            Spacer(modifier = Modifier.height(30.dp))
+            Box(
+                modifier = Modifier.size(300.dp).background(Color.White)
+            ) {
+                AndroidView(
+                    modifier = modifier, factory = {
+                        rtspClientView
+                    }
+                )
             }
-        )
+            Text(text = "Video Queue Size = ${videoQueueSize.value}", color = Color.Red, modifier = Modifier.background(Color.Green))
+            Text(text = "Audio Queue Size = ${audioQueueSize.value}", color = Color.Red, modifier = Modifier.background(Color.Green))
+        }
     ) {
         onDispose {
             rtspClientView.stop()

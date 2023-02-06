@@ -44,6 +44,10 @@ open class RtspSurfaceView: SurfaceView {
     private var audioCodecConfig: ByteArray? = null
     private var firstFrameRendered = false
 
+    fun getVideoFrameQueue() = this.videoFrameQueue
+
+    fun getAudioFrameQueue() = this.audioFrameQueue
+
     interface RtspStatusListener {
         fun onRtspStatusConnecting()
         fun onRtspStatusConnected()
