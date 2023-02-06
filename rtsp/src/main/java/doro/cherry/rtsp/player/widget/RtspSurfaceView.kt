@@ -98,7 +98,6 @@ open class RtspSurfaceView: SurfaceView {
                 audioChannelCount = sdpInfo.audioTrack?.channels!!
                 audioCodecConfig = sdpInfo.audioTrack?.config
             }
-            onRtspClientConnected()
             uiHandler.post {
                 statusListener?.onRtspStatusConnected()
             }
@@ -137,6 +136,7 @@ open class RtspSurfaceView: SurfaceView {
    private val surfaceCallback = object: SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
             if (DEBUG) Log.v(TAG, "surfaceCreated()")
+            onRtspClientConnected()
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
