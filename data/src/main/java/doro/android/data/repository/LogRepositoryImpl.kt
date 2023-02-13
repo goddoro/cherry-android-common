@@ -80,7 +80,7 @@ class LogRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sendGameButtonEvent(
-        name: CherryGameButtonName,
+        name: String,
         credit: Int?,
         cameraMode: CherryCameraMode?,
         machineNumber: String?,
