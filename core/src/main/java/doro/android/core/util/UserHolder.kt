@@ -33,6 +33,14 @@ class UserHolder @Inject constructor(
     fun setUserType(userType: UserType){
         prefUtil.setString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_TYPE, userType.name)
     }
+
+    fun getEmail(): String? {
+        return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_EMAIL)
+    }
+
+    fun setUserEmail(email: String){
+        prefUtil.setString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_EMAIL, email)
+    }
 }
 
 enum class UserType{
