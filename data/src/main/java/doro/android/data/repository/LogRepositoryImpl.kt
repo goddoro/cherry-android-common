@@ -4,7 +4,10 @@ import android.util.Log
 import doro.android.core.util.UserHolder
 import doro.android.data.dto.*
 import doro.android.data.service.LogService
-import doro.android.domain.enums.*
+import doro.android.domain.enums.CherryAction
+import doro.android.domain.enums.CherryButtonEvent
+import doro.android.domain.enums.CherryGameButtonName
+import doro.android.domain.enums.CherryUI
 import doro.android.domain.repository.LogRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -89,7 +92,7 @@ class LogRepositoryImpl @Inject constructor(
             val request = LogEventRequest(
                 playerId = userHolder.getUserId(),
                 action = CherryAction.clicked,
-                where = CherryUI.game,
+                where = if (name == CherryGameButtonName.available_machine_button.name) CherryUI.home else CherryUI.game,
                 data = GameButtonClickData(
                     name = name,
                     credit = credit,
