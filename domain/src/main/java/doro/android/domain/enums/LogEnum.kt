@@ -18,7 +18,7 @@ enum class CherryCameraMode {
 }
 
 enum class CherryButtonEvent {
-    log_in_button, log_out_button, sign_up_button, send_verification_email_button, available_machine_button,
+    log_in_button, log_out_button, sign_up_button, send_verification_email_button, available_machine_button, notification, profile, setting,
 }
 
 @Parcelize
