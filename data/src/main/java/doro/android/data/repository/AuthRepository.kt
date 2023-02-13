@@ -46,9 +46,9 @@ class AuthRepositoryImpl @Inject constructor(
         authService.verifyCode(params).success
     }
 
-    override suspend fun agentSignIn(email: String, password: String): Agent = withContext(Dispatchers.IO){
+    override suspend fun agentSignIn(name: String, password: String): Agent = withContext(Dispatchers.IO){
         val params = hashMapOf<String,String>().apply {
-            this["email"] = email
+            this["name"] = name
             this["password"] = password
         }
         authService.agentSignIn(params).agent.toDomain()

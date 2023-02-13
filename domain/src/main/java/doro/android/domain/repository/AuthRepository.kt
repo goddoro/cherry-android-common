@@ -9,5 +9,5 @@ interface AuthRepository {
     suspend fun sendVerifyCodeEmail(email: String): Boolean
     fun logout()
     suspend fun checkValidationCode(code: String): Boolean
-    suspend fun agentSignIn(email: String, password: String): Agent
+    suspend fun agentSignIn(name: String, password: String): Agent
 }
