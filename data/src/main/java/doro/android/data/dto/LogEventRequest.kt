@@ -65,7 +65,7 @@ data class GameButtonClickData(
     @SerializedName("credit")
     val credit: Int? = null,
     @SerializedName("cameraMode")
-    val cameraMode: CherryCameraMode? = null,
+    val cameraMode: String? = null,
     @SerializedName("machine")
     val machineNumber: String? = null,
 ) : Parcelable, CherryActionData()

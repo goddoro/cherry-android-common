@@ -82,7 +82,7 @@ class LogRepositoryImpl @Inject constructor(
     override suspend fun sendGameButtonEvent(
         name: String,
         credit: Int?,
-        cameraMode: CherryCameraMode?,
+        cameraMode: String?,
         machineNumber: String?,
     ): Unit = withContext(Dispatchers.IO) {
         try {

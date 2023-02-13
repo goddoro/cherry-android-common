@@ -1,8 +1,6 @@
 package doro.android.domain.repository
 
 import doro.android.domain.enums.CherryButtonEvent
-import doro.android.domain.enums.CherryCameraMode
-import doro.android.domain.enums.CherryGameButtonName
 import doro.android.domain.enums.CherryUI
 
 interface LogRepository {
@@ -18,7 +16,7 @@ interface LogRepository {
     suspend fun sendGameButtonEvent(
         name: String,
         credit: Int? = null,
-        cameraMode: CherryCameraMode? = null,
+        cameraMode: String? = null,
         machineNumber: String? = null,
     )
 }
