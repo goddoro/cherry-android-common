@@ -14,14 +14,14 @@ data class AgentResponse(
     @SerializedName("email")
     val email: String,
     @SerializedName("clients")
-    val clients: List<UserResponse>,
+    val clients: List<UserResponse>? = null,
 ): Parcelable{
     fun toDomain(): Agent {
         return Agent(
             id = this.id,
             name = this.name,
             email = this.email,
-            clients = this.clients.map { it.toDomain() },
+            clients = this.clients?.map { it.toDomain() },
         )
     }
 }
