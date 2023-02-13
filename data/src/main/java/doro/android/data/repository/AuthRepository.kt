@@ -2,6 +2,7 @@ package doro.android.data.repository
 
 import doro.android.core.util.UserHolder
 import doro.android.data.service.AuthService
+import doro.android.domain.entity.Agent
 import doro.android.domain.entity.User
 import doro.android.domain.repository.AuthRepository
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,14 @@ class AuthRepositoryImpl @Inject constructor(
             this["code"] = code
         }
         authService.verifyCode(params).success
+    }
+
+    override suspend fun agentSignIn(email: String, password: String): Agent = withContext(Dispatchers.IO){
+        val params = hashMapOf<String,String>().apply {
+            this["email"] = email
+            this["password"] = password
+        }
+        authService.agentSignIn(params).agent.toDomain()
     }
 
 

@@ -1,5 +1,6 @@
 package doro.android.data.service
 
+import doro.android.data.dto.AgentSignInResponse
 import doro.android.data.dto.EmptyResponse
 import doro.android.data.dto.SignInResponse
 import doro.android.data.dto.SignUpResponse
@@ -22,5 +23,9 @@ interface AuthService {
     @POST("auth/verify-code")
     @FormUrlEncoded
     suspend fun verifyCode(@FieldMap params: Map<String,String>): EmptyResponse
+
+    @POST("auth/sign-in-agent")
+    @FormUrlEncoded
+    suspend fun agentSignIn(@FieldMap params: Map<String, String>): AgentSignInResponse
 
 }

@@ -1,5 +1,6 @@
 package doro.android.domain.repository
 
+import doro.android.domain.entity.Agent
 import doro.android.domain.entity.User
 
 interface AuthRepository {
@@ -8,4 +9,5 @@ interface AuthRepository {
     suspend fun sendVerifyCodeEmail(email: String): Boolean
     fun logout()
     suspend fun checkValidationCode(code: String): Boolean
+    suspend fun agentSignIn(email: String, password: String): Agent
 }
