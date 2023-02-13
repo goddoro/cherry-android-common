@@ -11,6 +11,8 @@ data class AgentResponse(
     val id: Int,
     @SerializedName("name")
     val name: String,
+    @SerializedName("email")
+    val email: String,
     @SerializedName("clients")
     val clients: List<UserResponse>,
 ): Parcelable{
@@ -18,6 +20,7 @@ data class AgentResponse(
         return Agent(
             id = this.id,
             name = this.name,
+            email = this.email,
             clients = this.clients.map { it.toDomain() },
         )
     }

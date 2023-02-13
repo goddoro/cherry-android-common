@@ -3,5 +3,6 @@ package doro.android.domain.entity
 data class Agent(
     val id: Int,
     val name: String,
-    val clients: List<User>,
+    val email: String,
+    val clients: List<User>? = null,
 )
