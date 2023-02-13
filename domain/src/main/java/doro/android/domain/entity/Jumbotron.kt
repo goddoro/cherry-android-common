@@ -4,4 +4,5 @@ data class Jumbotron(
     val title: String,
     val body: String,
     val thumbnailUrl: String,
+    val createdAt: Int,
 )

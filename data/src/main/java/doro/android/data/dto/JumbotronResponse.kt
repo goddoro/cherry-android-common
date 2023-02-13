@@ -2,7 +2,6 @@ package doro.android.data.dto
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import doro.android.domain.entity.Agent
 import doro.android.domain.entity.Jumbotron
 import kotlinx.parcelize.Parcelize
 
@@ -14,6 +13,8 @@ data class JumbotronResponse(
     val body: String,
     @SerializedName("thumbnailUrl")
     val thumbnailUrl: String? = null,
+    @SerializedName("createdAt")
+    val createdAt: Int,
 ): Parcelable {
 
     fun toDomain(): Jumbotron {
@@ -21,6 +22,7 @@ data class JumbotronResponse(
             title = title,
             body = body,
             thumbnailUrl = thumbnailUrl.orEmpty(),
+            createdAt = createdAt,
         )
     }
 }
