@@ -14,7 +14,7 @@ data class JumbotronResponse(
     @SerializedName("thumbnailUrl")
     val thumbnailUrl: String? = null,
     @SerializedName("createdAt")
-    val createdAt: Int,
+    val createdAt: Long,
 ): Parcelable {
 
     fun toDomain(): Jumbotron {
