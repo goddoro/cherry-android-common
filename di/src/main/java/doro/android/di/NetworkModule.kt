@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import doro.android.core.util.NetworkUtil
 import doro.android.core.util.UserHolder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -109,6 +110,7 @@ class LogInterceptor @Inject constructor(
                 context.packageManager.getPackageInfo(context.packageName, 0).versionName
             )
             .header("x-cherry-log-env", "debug")
+            .header("x-cherry-log-ip", NetworkUtil.getIpAddress())
             .build()
         return chain.proceed(request)
     }
