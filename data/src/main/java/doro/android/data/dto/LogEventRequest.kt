@@ -61,7 +61,7 @@ data class GamePingData(
 @Parcelize
 data class GameButtonClickData(
     @SerializedName("name")
-    val name: String,
+    val name: CherryGameButtonName,
     @SerializedName("credit")
     val credit: Int? = null,
     @SerializedName("cameraMode")

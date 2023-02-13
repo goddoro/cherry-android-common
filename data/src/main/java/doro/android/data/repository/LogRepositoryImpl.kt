@@ -4,10 +4,7 @@ import android.util.Log
 import doro.android.core.util.UserHolder
 import doro.android.data.dto.*
 import doro.android.data.service.LogService
-import doro.android.domain.enums.CherryAction
-import doro.android.domain.enums.CherryActionData
-import doro.android.domain.enums.CherryButtonEvent
-import doro.android.domain.enums.CherryUI
+import doro.android.domain.enums.*
 import doro.android.domain.repository.LogRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -77,7 +74,31 @@ class LogRepositoryImpl @Inject constructor(
                 message = message,
             )
             logService.sendStreamingEvent(CherryStreamingLogEventRequest(request))
-        } catch (e: Throwable){
+        } catch (e: Throwable) {
+            Log.d(TAG, e.message.orEmpty())
+        }
+    }
+
+    override suspend fun sendGameButtonEvent(
+        name: CherryGameButtonName,
+        credit: Int?,
+        cameraMode: CherryCameraMode?,
+        machineNumber: String?,
+    ): Unit = withContext(Dispatchers.IO) {
+        try {
+            val request = LogEventRequest(
+                playerId = userHolder.getUserId(),
+                action = CherryAction.clicked,
+                where = CherryUI.game,
+                data = GameButtonClickData(
+                    name = name,
+                    credit = credit,
+                    cameraMode = cameraMode,
+                    machineNumber = machineNumber,
+                )
+            )
+            logService.sendEvent(CherryLogEventRequest(request))
+        } catch (e: Throwable) {
             Log.d(TAG, e.message.orEmpty())
         }
     }
