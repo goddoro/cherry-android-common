@@ -17,5 +17,5 @@ interface PointTransactionService {
     suspend fun request(@Body request: CreatePointRequest): EmptyResponse
 
     @GET("/user-point-request/")
-    suspend fun fetchRequest(@Query("userId") userId: Int): PointRequestsResponse
+    suspend fun fetchRequest(@Query("userId") userId: Int? = null, @Query("agentId") agentId: Int? = null ): PointRequestsResponse
 }

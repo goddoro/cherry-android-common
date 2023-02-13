@@ -13,6 +13,8 @@ data class UserPointRequestResponse(
     val id: Int,
     @SerializedName("agent")
     val agent: AgentResponse,
+    @SerializedName("user")
+    val user: UserResponse,
     @SerializedName("point")
     val point: Int,
     @SerializedName("status")
@@ -32,5 +34,6 @@ data class UserPointRequestResponse(
         createdAt = createdAt,
         money = money,
         type = type,
+        user = user.toDomain(),
     )
 }

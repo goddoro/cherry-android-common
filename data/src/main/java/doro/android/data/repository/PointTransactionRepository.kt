@@ -33,8 +33,11 @@ class PointTransactionRepositoryImpl @Inject constructor(
             pointTransactionService.request(userPointRequest).success
         }
 
-    override suspend fun fetchRequest(userId: Int): List<UserPointRequest> =
+    override suspend fun fetchRequest(userId: Int?, agentId: Int?): List<UserPointRequest> =
         withContext(Dispatchers.IO) {
-            pointTransactionService.fetchRequest(userId).userPointRequests.map { it.toDomain() }
+            pointTransactionService.fetchRequest(
+                userId,
+                agentId
+            ).userPointRequests.map { it.toDomain() }
         }
 }

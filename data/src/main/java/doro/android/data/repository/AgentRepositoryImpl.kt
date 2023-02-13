@@ -13,6 +13,6 @@ class AgentRepositoryImpl @Inject constructor(
 
     override suspend fun findOne(name: String): Agent =
         withContext(Dispatchers.IO) {
-            agentService.findOne(name).toDomain()
+            agentService.searchOne(name).toDomain()
         }
 }

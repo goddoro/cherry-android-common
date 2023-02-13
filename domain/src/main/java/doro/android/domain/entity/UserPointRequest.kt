@@ -7,6 +7,7 @@ data class UserPointRequest(
     val agent: Agent,
     val point: Int,
     val status: PointRequestStatus,
+    val user: User,
     val createdAt: String,
     val money: Int,
     val type: PointRequestType
