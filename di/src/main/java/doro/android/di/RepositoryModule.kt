@@ -62,4 +62,9 @@ abstract class RepositoryModule {
     abstract fun bindLogRepository(
         logRepositoryImpl: LogRepositoryImpl
     ): LogRepository
+
+    @Binds
+    abstract fun bindJumbotronRepository(
+        jumbotronRepositoryImpl: JumbotronRepositoryImpl
+    ): JumbotronRepository
 }

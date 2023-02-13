@@ -63,4 +63,9 @@ class ApiModule {
     fun provideLogService(@Named(LOG_NAMED) retrofit: Retrofit): LogService =
         retrofit.create(LogService::class.java)
 
+    @Singleton
+    @Provides
+    fun provideJumbotronService(retrofit: Retrofit): JumbotronService =
+        retrofit.create(JumbotronService::class.java)
+
 }
