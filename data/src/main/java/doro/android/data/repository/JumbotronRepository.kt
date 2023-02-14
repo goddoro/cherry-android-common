@@ -1,5 +1,6 @@
 package doro.android.data.repository
 
+import doro.android.data.dto.JumbotronCreateRequest
 import doro.android.data.service.JumbotronService
 import doro.android.domain.entity.Jumbotron
 import doro.android.domain.repository.JumbotronRepository
@@ -12,7 +13,12 @@ class JumbotronRepositoryImpl @Inject constructor(
 ) : JumbotronRepository {
     override suspend fun create(title: String, body: String, gameId: Int?) =
         withContext(Dispatchers.IO) {
-            jumbotronService.create()
+            val request = JumbotronCreateRequest(
+                title = title,
+                body = body,
+                gameId = gameId,
+            )
+            jumbotronService.create(request)
         }
 
     override suspend fun fetchList(): List<Jumbotron> = withContext(Dispatchers.IO) {
