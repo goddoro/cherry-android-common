@@ -21,27 +21,11 @@ data class CherryErrorResponse(
     val message: String
 ) : ErrorResponse(), Parcelable
 
-
-@Parcelize
-data class BadRequestResponse(
-    @SerializedName("statusCode")
-    val statusCode: Int,
-
-    @SerializedName("message")
-    val message: List<String>,
-
-    @SerializedName("error")
-    val error: String
-) : ErrorResponse(), Parcelable
-
 open class ErrorResponse {
 
     fun printErrorMessage(context: Context): String {
 
         return when (this) {
-            is BadRequestResponse -> {
-                this.error
-            }
             is CherryErrorResponse -> {
                 this.message
             }
@@ -55,17 +39,12 @@ open class ErrorResponse {
         fun parseThrowable(throwable: Throwable): ErrorResponse {
 
             return if (throwable is HttpException) {
-                if (throwable.message == "HTTP 400 Bad Request") {
-                    Gson().fromJson(
-                        throwable.response()?.errorBody()?.string(),
-                        BadRequestResponse::class.java
-                    )
-                } else {
-                    Gson().fromJson(
-                        throwable.response()?.errorBody()?.string(),
-                        CherryErrorResponse::class.java
-                    )
-                }
+
+                Gson().fromJson(
+                    throwable.response()?.errorBody()?.string(),
+                    CherryErrorResponse::class.java
+                )
+
             } else {
                 Log.d("CherryErrorResponse", throwable.message.orEmpty())
                 ErrorResponse()
