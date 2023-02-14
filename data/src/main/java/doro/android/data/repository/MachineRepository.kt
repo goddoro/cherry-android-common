@@ -13,9 +13,9 @@ import javax.inject.Inject
 class MachineRepositoryImpl @Inject constructor(
     private val machineService: MachineService
 ) : MachineRepository {
-    override suspend fun fetchList(gameId: Int): List<Machine> =
+    override suspend fun fetchList(): List<Machine> =
         withContext(Dispatchers.IO) {
-            machineService.findList(gameId).machines.map { it.toDomain() }
+            machineService.findList().machines.map { it.toDomain() }
         }
 
     override suspend fun creditIn(machineNumber: String, point: Int) =

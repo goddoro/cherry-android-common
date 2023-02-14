@@ -3,7 +3,7 @@ package doro.android.domain.repository
 import doro.android.domain.entity.Machine
 
 interface MachineRepository {
-    suspend fun fetchList(gameId: Int): List<Machine>
+    suspend fun fetchList(): List<Machine>
     suspend fun creditIn(machineNumber: String, point: Int)
     suspend fun creditOut(machineNumber: String, point: Int)
     suspend fun holdSlot(machineNumber: String)

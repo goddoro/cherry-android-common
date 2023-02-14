@@ -11,7 +11,7 @@ interface MachineService {
     suspend fun findOne(@Path("number") number : String) : MachineResponse
 
     @GET("/machines")
-    suspend fun findList(@Query("gameId") gameId: Int): MachineListResponse
+    suspend fun findList(): MachineListResponse
 
     @POST("/machines/command")
     suspend fun command(@Body request: MachineCommandRequest)
