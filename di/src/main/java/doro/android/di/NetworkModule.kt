@@ -87,7 +87,7 @@ class CherryInterceptor @Inject constructor(
         val request = chain.request().newBuilder()
             .header("Authorization", "Bearer ${userHolder.getToken().orEmpty()}")
             .header("x-cherry-device-name", android.os.Build.MODEL)
-            .header("x-cherry-client", "android-" + userHolder.getUserType())
+            .header("x-cherry-client", "android_" + userHolder.getUserType())
             .header(
                 "x-cherry-version",
                 context.packageManager.getPackageInfo(context.packageName, 0).versionName
@@ -103,7 +103,7 @@ class LogInterceptor @Inject constructor(
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
-            .header("x-cherry-log-client", "android-" + userHolder.getUserType())
+            .header("x-cherry-log-client", "android_" + userHolder.getUserType())
             .header("x-cherry-log-device-name", android.os.Build.MODEL)
             .header(
                 "x-cherry-log-version",
