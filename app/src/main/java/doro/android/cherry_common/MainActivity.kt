@@ -3,27 +3,46 @@ package doro.android.cherry_common
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.WindowManager
+import android.widget.TextClock
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.source.rtsp.RtspMediaSource
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import dagger.hilt.android.AndroidEntryPoint
-import doro.android.domain.enums.CherryUI
+import doro.android.core.util.SocketClient
 import doro.android.domain.repository.LogRepository
 import doro.cherry.rtsp.player.widget.RtspSurfaceView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.net.Socket
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val videoUrl =
+        "rtsp://admin:Cherry11!\$@61.72.138.120:553/Streaming/Channels/102?transportmode=unicast&profile=Profile_2"
+
+    val socket = SocketClient()
+
     @Inject
     lateinit var logRepository: LogRepository
 
@@ -31,11 +50,52 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            RtspClientScreen(
-                videoUrl = "rtsp://admin:Cherry01!\$@61.72.138.120:555/Streaming/Channels/101",
-                logRepository = logRepository,
-            )
+            Column {
+                Row {
+
+                    RtspClientScreen(
+                        videoUrl = videoUrl,
+                        logRepository = logRepository,
+                    )
+                    ExoPlayerScreen(
+                        videoUrl = videoUrl,
+                    )
+                }
+                Text(text = "socket", modifier = Modifier.clickable {
+//                    socket.sendMessage()
+                }, color = Color.White)
+            }
         }
+
+        init()
+    }
+
+    private fun init() {
+
+    }
+
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        initView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        initView()
+    }
+
+    private fun initView() {
+        window.decorView.apply {
+            systemUiVisibility =
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        }
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 }
 
@@ -55,7 +115,7 @@ private fun RtspClientScreen(
         RtspSurfaceView(context).apply {
             val uri = Uri.parse(videoUrl)
             val username = "admin"
-            val password = "Cherry01!$"
+            val password = "Cherry11!$"
             init(uri, username, password)
             start(requestVideo = true, requestAudio = true)
             setStatusListener(object : RtspSurfaceView.RtspStatusListener {
@@ -103,10 +163,7 @@ private fun RtspClientScreen(
     }
     DisposableEffect(
         Column(
-            modifier = Modifier.background(Color.Yellow)
         ) {
-            Text(text = "HELLO TESTER1", color = Color.Red)
-            Spacer(modifier = Modifier.height(30.dp))
             Box(
                 modifier = Modifier
                     .size(300.dp)
@@ -118,12 +175,86 @@ private fun RtspClientScreen(
                     }
                 )
             }
-            Text(text = "Video Queue Size = ${videoQueueSize.value}", color = Color.Red, modifier = Modifier.background(Color.Green))
-            Text(text = "Audio Queue Size = ${audioQueueSize.value}", color = Color.Red, modifier = Modifier.background(Color.Green))
+            Text(
+                text = "Cherry Rtsp Client",
+                color = Color.Red,
+                fontSize = 20.sp,
+            )
+//            Text(
+//                text = "Video Queue Size = ${videoQueueSize.value}",
+//                color = Color.Red,
+//                modifier = Modifier.background(Color.Green)
+//            )
+//            Text(
+//                text = "Audio Queue Size = ${audioQueueSize.value}",
+//                color = Color.Red,
+//                modifier = Modifier.background(Color.Green)
+//            )
         }
     ) {
         onDispose {
             rtspClientView.stop()
         }
     }
+}
+
+@Composable
+private fun ExoPlayerScreen(
+    modifier: Modifier = Modifier,
+    videoUrl: String,
+) {
+
+    val context = LocalContext.current
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context)
+            .build()
+            .apply {
+                val mediaItem = MediaItem.fromUri(videoUrl)
+                val mediaSource =
+                    RtspMediaSource.Factory().setForceUseRtpTcp(true).createMediaSource(mediaItem)
+                setMediaSource(mediaSource)
+                playWhenReady = true
+                prepare()
+            }
+    }
+
+    DisposableEffect(
+        Column {
+            AndroidView(modifier = Modifier.size(300.dp), factory = {
+                StyledPlayerView(context).apply {
+                    hideController()
+                    player = exoPlayer
+                    useController = false
+                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+                }
+            })
+            Text(
+                text = "ExoPlayer",
+                color = Color.Red,
+                fontSize = 20.sp,
+            )
+        }
+    ) {
+        onDispose {
+            exoPlayer.release()
+        }
+    }
+}
+
+@Composable
+fun TextClockCompose(
+    modifier: Modifier = Modifier,
+    timeZone: String? = null,
+) {
+    AndroidView(
+        factory = { context ->
+            TextClock(context).apply {
+                format12Hour?.let { this.format12Hour = "yyyy-MM-dd hh:mm:ss a" }
+                format24Hour?.let { this.format24Hour = "yyyy-MM-dd hh:mm:ss" }
+                timeZone?.let { this.timeZone = it }
+                setTextColor(context.resources.getColor(R.color.purple_200))
+            }
+        },
+        modifier = modifier
+    )
 }

@@ -12,10 +12,4 @@ import retrofit2.http.Query
 interface PointTransactionService {
     @GET("/user-point-transactions/")
     suspend fun fetch(): PointTransactionsResponse
-
-    @POST("/user-point-request/")
-    suspend fun request(@Body request: CreatePointRequest): EmptyResponse
-
-    @GET("/user-point-request/")
-    suspend fun fetchRequest(@Query("userId") userId: Int? = null, @Query("agentId") agentId: Int? = null ): PointRequestsResponse
 }

@@ -111,6 +111,7 @@ class LogInterceptor @Inject constructor(
             )
             .header("x-cherry-log-env", "debug")
             .header("x-cherry-log-ip", NetworkUtil.getIpAddress())
+            .header("x-cherry-log-user-id", "${userHolder.getUserId()}")
             .build()
         return chain.proceed(request)
     }

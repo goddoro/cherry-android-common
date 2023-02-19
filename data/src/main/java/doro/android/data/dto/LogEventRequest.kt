@@ -19,8 +19,6 @@ data class CherryStreamingLogEventRequest(
 
 @Parcelize
 data class CherryStreamingLogEvent(
-    @SerializedName("player")
-    val playerId: Int,
     @SerializedName("message")
     val message: String,
     @SerializedName("type")
@@ -29,8 +27,6 @@ data class CherryStreamingLogEvent(
 
 @Parcelize
 data class LogEventRequest(
-    @SerializedName("player")
-    val playerId: Int,
     @SerializedName("where")
     val where: CherryUI,
     @SerializedName("action")

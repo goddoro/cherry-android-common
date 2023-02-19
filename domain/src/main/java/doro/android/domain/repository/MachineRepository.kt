@@ -1,5 +1,6 @@
 package doro.android.domain.repository
 
+import doro.android.domain.entity.GameButton
 import doro.android.domain.entity.Machine
 
 interface MachineRepository {
@@ -8,7 +9,7 @@ interface MachineRepository {
     suspend fun creditOut(machineNumber: String, point: Int)
     suspend fun holdSlot(machineNumber: String)
     suspend fun releaseSlot(machineNumber: String)
-    suspend fun pressButton(machineNumber: String, buttonNumber: Int)
+    suspend fun pressButton(machineNumber: String, button: GameButton)
     suspend fun searchOccupied(): Machine
     suspend fun findOne(number: String): Machine
 }

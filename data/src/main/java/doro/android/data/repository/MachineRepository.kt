@@ -3,7 +3,10 @@ package doro.android.data.repository
 import android.os.Parcelable
 import doro.android.data.service.MachineCommandRequest
 import doro.android.data.service.MachineService
+import doro.android.domain.entity.GameButton
 import doro.android.domain.entity.Machine
+import doro.android.domain.enums.CherryGameButtonName
+import doro.android.domain.repository.LogRepository
 import doro.android.domain.repository.MachineRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -11,29 +14,38 @@ import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 class MachineRepositoryImpl @Inject constructor(
-    private val machineService: MachineService
+    private val machineService: MachineService,
+    private val logRepository: LogRepository,
 ) : MachineRepository {
     override suspend fun fetchList(): List<Machine> =
         withContext(Dispatchers.IO) {
             machineService.findList().machines.map { it.toDomain() }
         }
 
-    override suspend fun creditIn(machineNumber: String, point: Int) =
+    override suspend fun creditIn(machineNumber: String, credit: Int) =
         withContext(Dispatchers.IO) {
+            logRepository.sendGameButtonEvent(
+                name = CherryGameButtonName.credit_in.name,
+                credit = credit,
+            )
             val request = MachineCommandRequest(
                 endPoint = "credit-in",
                 machineNumber = machineNumber,
-                credit = point
+                credit = credit
             )
             machineService.command(request)
         }
 
-    override suspend fun creditOut(machineNumber: String, point: Int) =
+    override suspend fun creditOut(machineNumber: String, credit: Int) =
         withContext(Dispatchers.IO) {
+            logRepository.sendGameButtonEvent(
+                name = CherryGameButtonName.credit_in.name,
+                credit = credit,
+            )
             val request = MachineCommandRequest(
                 endPoint = "credit-out",
                 machineNumber = machineNumber,
-                credit = point
+                credit = credit
             )
             machineService.command(request)
         }
@@ -46,12 +58,15 @@ class MachineRepositoryImpl @Inject constructor(
         machineService.command(request)
     }
 
-    override suspend fun pressButton(machineNumber: String, buttonNumber: Int) =
+    override suspend fun pressButton(machineNumber: String, button: GameButton) =
         withContext(Dispatchers.IO) {
+            logRepository.sendGameButtonEvent(
+                name = button.name.lowercase()
+            )
             val request = MachineCommandRequest(
                 endPoint = "press-button",
                 machineNumber = machineNumber,
-                buttonNumber = buttonNumber,
+                buttonNumber = button.number,
             )
             machineService.command(request)
         }
