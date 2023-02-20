@@ -7,9 +7,11 @@ import io.socket.client.Socket.EVENT_CONNECT_ERROR
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import org.json.JSONObject
 
 @OptIn(DelicateCoroutinesApi::class)
 class CherrySocketClient(
@@ -23,51 +25,34 @@ class CherrySocketClient(
             this["userId"] = listOf("${userHolder.getUserId()}")
         }
     }
-//    private val socket = IO.socket("http://15.165.196.152:7998", options)
-    private val socket = IO.socket("http://221.140.196.19:7998", options)
+    private val socket = IO.socket("http://15.165.196.152:7998", options)
+
 
     init {
+        GlobalScope.launch(Dispatchers.Main) {
+            listen().collect {
+                Log.d("Socket", Thread.currentThread().name)
+                try {
+                    val command = JSONObject(it[0].toString())
+                    val type = command.optString("type")
+                    val networkCameraAddress = command.optString("cameraUrl")
+                    val machineNumber = command.optString("machineNumber")
+                    val streamingAddress = command.optString("streamUrl")
+                    val credit = command.optInt("credit")
+
+                    Log.d("Socket", type)
+                    Log.d("Socket", networkCameraAddress)
+                    Log.d("Socket", machineNumber)
+                    Log.d("Socket", streamingAddress)
+                    Log.d("Socket", credit.toString())
 
 
-        GlobalScope.launch(Dispatchers.IO) {
-            socket.connect()
-
-            socket.on(io.socket.client.Socket.EVENT_CONNECT) {
-                // 소켓 서버에 연결이 성공하면 호출됩니다.
-                Log.i("Socket", "Connect")
-            }.on(io.socket.client.Socket.EVENT_DISCONNECT) { args ->
-                // 소켓 서버 연결이 끊어질 경우에 호출됩니다.
-                Log.i("Socket", "Disconnet: ${args[0]}")
-            }.on(EVENT_CONNECT_ERROR) { args ->
-                socket.connect()
-                Log.i("Socket", "Connect Error: ${args[0]}")
-            }.on("events") {
-                Log.i("Socket", it.toString())
-
-                val type = "good"
-                val credit = 3
-                val networkCameraAddress = "zxcv"
-                val machineNumber = "01001"
-                val streamingAddress = "zxcv"
-
-                GlobalScope.launch {
                     when (type) {
                         SocketMessageType.SS.name -> {
                             Broadcast.refreshMachineEvent.emit(Unit)
                         }
                         SocketMessageType.NC.name -> {
                             Broadcast.notifyCreditEvent.emit(credit)
-                        }
-                        SocketMessageType.HS.name -> {
-                            Broadcast.holdSlotNetworking.emit(false)
-                            Broadcast.holdSlotEvent.emit(
-                                HoldSlotValue(
-                                    cameraUrl = networkCameraAddress,
-                                    streamUrl = streamingAddress,
-                                    machineNumber = machineNumber,
-                                    credit = credit,
-                                )
-                            )
                         }
                         SocketMessageType.RS.name -> {
                             Broadcast.releaseSlotEvent.emit(credit)
@@ -78,11 +63,49 @@ class CherrySocketClient(
                         SocketMessageType.OC.name -> {
                             Broadcast.creditOutEvent.emit(credit)
                         }
+                        SocketMessageType.HS.name -> {
+                            Log.d("Socket", "가즈아")
+                            Broadcast.holdSlotNetworking.emit(false)
+                            Broadcast.holdSlotEvent.emit(
+                                HoldSlotValue(
+                                    cameraUrl = networkCameraAddress,
+                                    streamUrl = streamingAddress,
+                                    machineNumber = machineNumber,
+                                    credit = credit,
+                                )
+                            )
+                        }
+
                     }
+                } catch (e: Throwable){
+
                 }
             }
         }
     }
+
+    private fun listen(): Flow<Array<out Any>> = callbackFlow {
+
+        socket.connect()
+
+        socket.on(io.socket.client.Socket.EVENT_CONNECT) {
+            // 소켓 서버에 연결이 성공하면 호출됩니다.
+            Log.i("Socket", "Connect")
+        }.on(io.socket.client.Socket.EVENT_DISCONNECT) { args ->
+            // 소켓 서버 연결이 끊어질 경우에 호출됩니다.
+            Log.i("Socket", "Disconnet: ${args[0]}")
+        }.on(EVENT_CONNECT_ERROR) { args ->
+            socket.connect()
+            Log.i("Socket", "Connect Error: ${args[0]}")
+        }.on("events") {
+            it.forEach { value ->
+                Log.d("Socket", value.toString())
+            }
+            trySend(it)
+        }
+        awaitClose()
+    }
+
 }
 
 object Broadcast {
@@ -93,7 +116,7 @@ object Broadcast {
     val creditInEvent = MutableSharedFlow<Int>()
     val creditOutEvent = MutableSharedFlow<Int>()
     val userRefreshEvent = MutableSharedFlow<Unit>()
-    val holdSlotNetworking = MutableSharedFlow<Boolean>()
+    val holdSlotNetworking = MutableStateFlow(false)
     val refreshMachineEvent = MutableSharedFlow<Unit>()
     val machineStatusChange = MutableSharedFlow<String>()
 }
