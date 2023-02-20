@@ -1,4 +1,4 @@
-package doro.android.domain
+package doro.android.socket
 
 import org.junit.Test
 

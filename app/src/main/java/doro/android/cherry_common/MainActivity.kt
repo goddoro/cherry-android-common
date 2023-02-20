@@ -28,7 +28,6 @@ import com.google.android.exoplayer2.source.rtsp.RtspMediaSource
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import dagger.hilt.android.AndroidEntryPoint
-import doro.android.core.util.SocketClient
 import doro.android.domain.repository.LogRepository
 import doro.cherry.rtsp.player.widget.RtspSurfaceView
 import kotlinx.coroutines.delay
@@ -40,8 +39,6 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     private val videoUrl =
         "rtsp://admin:Cherry11!\$@61.72.138.120:553/Streaming/Channels/102?transportmode=unicast&profile=Profile_2"
-
-    val socket = SocketClient()
 
     @Inject
     lateinit var logRepository: LogRepository

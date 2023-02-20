@@ -1,6 +1,7 @@
 package doro.android.data.repository
 
 import android.os.Parcelable
+import doro.android.core.util.SoundEffectPlayer
 import doro.android.data.service.MachineCommandRequest
 import doro.android.data.service.MachineService
 import doro.android.domain.entity.GameButton
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class MachineRepositoryImpl @Inject constructor(
     private val machineService: MachineService,
     private val logRepository: LogRepository,
+    private val soundEffectPlayer: SoundEffectPlayer,
 ) : MachineRepository {
     override suspend fun fetchList(): List<Machine> =
         withContext(Dispatchers.IO) {
@@ -60,6 +62,7 @@ class MachineRepositoryImpl @Inject constructor(
 
     override suspend fun pressButton(machineNumber: String, button: GameButton) =
         withContext(Dispatchers.IO) {
+            soundEffectPlayer.play()
             logRepository.sendGameButtonEvent(
                 name = button.name.lowercase()
             )
