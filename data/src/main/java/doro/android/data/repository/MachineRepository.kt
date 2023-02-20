@@ -62,7 +62,9 @@ class MachineRepositoryImpl @Inject constructor(
 
     override suspend fun pressButton(machineNumber: String, button: GameButton) =
         withContext(Dispatchers.IO) {
-            soundEffectPlayer.play()
+            withContext(Dispatchers.Main) {
+                soundEffectPlayer.play()
+            }
             logRepository.sendGameButtonEvent(
                 name = button.name.lowercase()
             )
