@@ -76,6 +76,17 @@ class MachineRepositoryImpl @Inject constructor(
             machineService.command(request)
         }
 
+    override suspend fun selectEvent(machineNumber: String, eventNumber: Int) {
+        withContext(Dispatchers.IO){
+            val request = MachineCommandRequest(
+                endPoint = "select-event",
+                machineNumber = machineNumber,
+                eventNumber = eventNumber,
+            )
+            machineService.command(request)
+        }
+    }
+
     override suspend fun searchOccupied(): Machine =
         withContext(Dispatchers.IO) {
             machineService.searchOccupied().toDomain()

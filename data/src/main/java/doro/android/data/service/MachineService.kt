@@ -34,4 +34,7 @@ data class MachineCommandRequest(
 
     @SerializedName("credit")
     val credit: Int? = null,
+
+    @SerializedName("eventNumber")
+    val eventNumber: Int? = null,
 ): Parcelable

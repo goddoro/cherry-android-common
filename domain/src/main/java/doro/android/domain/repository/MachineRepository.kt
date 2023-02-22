@@ -10,6 +10,7 @@ interface MachineRepository {
     suspend fun holdSlot(machineNumber: String)
     suspend fun releaseSlot(machineNumber: String)
     suspend fun pressButton(machineNumber: String, button: GameButton)
+    suspend fun selectEvent(machineNumber: String, eventNumber: Int)
     suspend fun searchOccupied(): Machine
     suspend fun findOne(number: String): Machine
 }
