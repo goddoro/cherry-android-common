@@ -31,7 +31,7 @@ class MachineRepositoryImpl @Inject constructor(
                 credit = credit,
             )
             val request = MachineCommandRequest(
-                endPoint = "credit-in",
+                endPoint = "IC",
                 machineNumber = machineNumber,
                 credit = credit
             )
@@ -45,7 +45,7 @@ class MachineRepositoryImpl @Inject constructor(
                 credit = credit,
             )
             val request = MachineCommandRequest(
-                endPoint = "credit-out",
+                endPoint = "OC",
                 machineNumber = machineNumber,
                 credit = credit
             )
@@ -54,7 +54,7 @@ class MachineRepositoryImpl @Inject constructor(
 
     override suspend fun holdSlot(machineNumber: String) = withContext(Dispatchers.IO) {
         val request = MachineCommandRequest(
-            endPoint = "hold-slot",
+            endPoint = "HS",
             machineNumber = machineNumber,
         )
         machineService.command(request)
@@ -69,7 +69,7 @@ class MachineRepositoryImpl @Inject constructor(
                 name = button.name.lowercase()
             )
             val request = MachineCommandRequest(
-                endPoint = "press-button",
+                endPoint = "PB",
                 machineNumber = machineNumber,
                 buttonNumber = button.number,
             )
@@ -79,7 +79,7 @@ class MachineRepositoryImpl @Inject constructor(
     override suspend fun selectEvent(machineNumber: String, eventNumber: Int) {
         withContext(Dispatchers.IO){
             val request = MachineCommandRequest(
-                endPoint = "select-event",
+                endPoint = "SE",
                 machineNumber = machineNumber,
                 eventNumber = eventNumber,
             )
@@ -95,7 +95,7 @@ class MachineRepositoryImpl @Inject constructor(
     override suspend fun releaseSlot(machineNumber: String) =
         withContext(Dispatchers.IO) {
             val request = MachineCommandRequest(
-                endPoint = "release-slot",
+                endPoint = "RS",
                 machineNumber = machineNumber,
             )
             machineService.command(request)
