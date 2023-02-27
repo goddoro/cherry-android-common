@@ -87,9 +87,9 @@ class MachineRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchOccupied(): Machine =
+    override suspend fun searchOccupied(): String? =
         withContext(Dispatchers.IO) {
-            machineService.searchOccupied().toDomain()
+            machineService.searchOccupied().number
         }
 
     override suspend fun releaseSlot(machineNumber: String) =
