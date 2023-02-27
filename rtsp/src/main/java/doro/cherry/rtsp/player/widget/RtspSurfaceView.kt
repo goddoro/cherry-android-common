@@ -33,7 +33,7 @@ open class RtspSurfaceView: SurfaceView {
     private var videoFrameQueue = FrameQueue(60) {
         onBufferMax()
     }
-    private var audioFrameQueue = FrameQueue(10)
+    private var audioFrameQueue = FrameQueue(60000)
     private var videoDecodeThread: VideoDecodeThread? = null
     private var audioDecodeThread: AudioDecodeThread? = null
     private var surfaceWidth = 960
@@ -106,7 +106,7 @@ open class RtspSurfaceView: SurfaceView {
                 audioChannelCount = sdpInfo.audioTrack?.channels!!
                 audioCodecConfig = sdpInfo.audioTrack?.config
             }
-
+            onRtspClientConnected()
             uiHandler.post {
                 statusListener?.onRtspStatusConnected()
             }
@@ -125,6 +125,8 @@ open class RtspSurfaceView: SurfaceView {
             uiHandler.post {
                 statusListener?.onRtspStatusDisconnected()
             }
+            audioFrameQueue.clear()
+            videoFrameQueue.clear()
         }
 
         override fun onRtspFailedUnauthorized() {
@@ -145,7 +147,6 @@ open class RtspSurfaceView: SurfaceView {
    private val surfaceCallback = object: SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
             if (DEBUG) Log.v(TAG, "surfaceCreated()")
-            onRtspClientConnected(holder.surface)
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -263,8 +264,9 @@ open class RtspSurfaceView: SurfaceView {
         uiHandler.post { statusListener?.onRtspStatusConnected() }
     }
 
-    private fun onRtspClientConnected(surface: Surface) {
+    private fun onRtspClientConnected() {
         if (DEBUG) Log.v(TAG, "onRtspClientConnected()")
+        Log.d(TAG, "WHAT THE FUCK!!" + videoMimeType)
         if (videoMimeType.isNotEmpty()) {
             firstFrameRendered = false
             val onFrameRenderedListener =
@@ -274,10 +276,11 @@ open class RtspSurfaceView: SurfaceView {
                 }
             Log.i(TAG, "Starting video decoder with mime type \"$videoMimeType\"")
             videoDecodeThread = VideoDecodeThread(
-                surface, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener)
+                holder.surface, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener)
             videoDecodeThread!!.name = "RTSP video thread [${getUriName()}]"
             videoDecodeThread!!.start()
         }
+        Log.d(TAG, "WHAT THE FUCK!!" + audioMimeType)
         if (audioMimeType.isNotEmpty() /*&& checkAudio!!.isChecked*/) {
             Log.i(TAG, "Starting audio decoder with mime type \"$audioMimeType\"")
             audioDecodeThread = AudioDecodeThread(
