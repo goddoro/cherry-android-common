@@ -106,7 +106,7 @@ open class RtspSurfaceView: SurfaceView {
                 audioChannelCount = sdpInfo.audioTrack?.channels!!
                 audioCodecConfig = sdpInfo.audioTrack?.config
             }
-            onRtspClientConnected()
+            audioStart()
             uiHandler.post {
                 statusListener?.onRtspStatusConnected()
             }
@@ -144,9 +144,39 @@ open class RtspSurfaceView: SurfaceView {
         }
     }
 
+    private fun videoStart(surface: Surface){
+        if (videoMimeType.isNotEmpty()) {
+            firstFrameRendered = false
+            val onFrameRenderedListener =
+                MediaCodec.OnFrameRenderedListener { _, _, _ ->
+                    if (!firstFrameRendered) statusListener?.onRtspFirstFrameRendered()
+                    firstFrameRendered = true
+                }
+            Log.i(TAG, "Starting video decoder with mime type \"$videoMimeType\"")
+            videoDecodeThread = VideoDecodeThread(
+                surface, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener)
+            videoDecodeThread!!.name = "RTSP video thread [${getUriName()}]"
+            videoDecodeThread!!.start()
+        }
+
+
+    }
+
+    private fun audioStart() {
+        if (audioMimeType.isNotEmpty() /*&& checkAudio!!.isChecked*/) {
+            Log.i(TAG, "Starting audio decoder with mime type \"$audioMimeType\"")
+            audioDecodeThread = AudioDecodeThread(
+                audioMimeType, audioSampleRate, audioChannelCount, audioCodecConfig, audioFrameQueue)
+            audioDecodeThread!!.name = "RTSP audio thread [${getUriName()}]"
+            audioDecodeThread!!.start()
+        }
+
+    }
+
    private val surfaceCallback = object: SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
             if (DEBUG) Log.v(TAG, "surfaceCreated()")
+            videoStart(holder.surface)
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -262,32 +292,6 @@ open class RtspSurfaceView: SurfaceView {
     private fun onRtspClientStarted() {
         if (DEBUG) Log.v(TAG, "onRtspClientStarted()")
         uiHandler.post { statusListener?.onRtspStatusConnected() }
-    }
-
-    private fun onRtspClientConnected() {
-        if (DEBUG) Log.v(TAG, "onRtspClientConnected()")
-        Log.d(TAG, "WHAT THE FUCK!!" + videoMimeType)
-        if (videoMimeType.isNotEmpty()) {
-            firstFrameRendered = false
-            val onFrameRenderedListener =
-                MediaCodec.OnFrameRenderedListener { _, _, _ ->
-                    if (!firstFrameRendered) statusListener?.onRtspFirstFrameRendered()
-                    firstFrameRendered = true
-                }
-            Log.i(TAG, "Starting video decoder with mime type \"$videoMimeType\"")
-            videoDecodeThread = VideoDecodeThread(
-                holder.surface, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener)
-            videoDecodeThread!!.name = "RTSP video thread [${getUriName()}]"
-            videoDecodeThread!!.start()
-        }
-        Log.d(TAG, "WHAT THE FUCK!!" + audioMimeType)
-        if (audioMimeType.isNotEmpty() /*&& checkAudio!!.isChecked*/) {
-            Log.i(TAG, "Starting audio decoder with mime type \"$audioMimeType\"")
-            audioDecodeThread = AudioDecodeThread(
-                audioMimeType, audioSampleRate, audioChannelCount, audioCodecConfig, audioFrameQueue)
-            audioDecodeThread!!.name = "RTSP audio thread [${getUriName()}]"
-            audioDecodeThread!!.start()
-        }
     }
 
     private fun onRtspClientStopped() {

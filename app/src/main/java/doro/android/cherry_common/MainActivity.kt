@@ -37,8 +37,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val videoUrl =
-        "rtsp://admin:Cherry11!\$@61.72.138.120:553/Streaming/Channels/102?transportmode=unicast&profile=Profile_2"
+
 
     @Inject
     lateinit var logRepository: LogRepository
@@ -47,20 +46,31 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            Column {
+            Column(
+                modifier = Modifier.size(400.dp)
+            ) {
+                val videoUrl =
+                    remember { mutableStateOf("rtsp://admin:Cherry11!\$@61.72.138.120:552/live") }
                 Row {
 
-                    RtspClientScreen(
-                        videoUrl = videoUrl,
-                        logRepository = logRepository,
-                    )
-                    ExoPlayerScreen(
-                        videoUrl = videoUrl,
-                    )
+                    if ( videoUrl.value != "") {
+                        RtspClientScreen(
+                            videoUrl = videoUrl.value,
+                            logRepository = logRepository,
+                        )
+                    }
+//                    ExoPlayerScreen(
+//                        videoUrl = videoUrl.value,
+//                    )
                 }
-                Text(text = "socket", modifier = Modifier.clickable {
-//                    socket.sendMessage()
-                }, color = Color.White)
+                Text(text = "on/off", modifier = Modifier.clickable {
+                    if (videoUrl.value == ""){
+                        videoUrl.value = "rtsp://admin:Cherry11!\$@61.72.138.120:552/live"
+                    } else {
+                        videoUrl.value = ""
+                    }
+
+                }, color = Color.Yellow, fontSize = 30.sp)
             }
         }
 
@@ -177,16 +187,16 @@ private fun RtspClientScreen(
                 color = Color.Red,
                 fontSize = 20.sp,
             )
-//            Text(
-//                text = "Video Queue Size = ${videoQueueSize.value}",
-//                color = Color.Red,
-//                modifier = Modifier.background(Color.Green)
-//            )
-//            Text(
-//                text = "Audio Queue Size = ${audioQueueSize.value}",
-//                color = Color.Red,
-//                modifier = Modifier.background(Color.Green)
-//            )
+            Text(
+                text = "Video Queue Size = ${videoQueueSize.value}",
+                color = Color.Red,
+                modifier = Modifier.background(Color.Green)
+            )
+            Text(
+                text = "Audio Queue Size = ${audioQueueSize.value}",
+                color = Color.Red,
+                modifier = Modifier.background(Color.Green)
+            )
         }
     ) {
         onDispose {
