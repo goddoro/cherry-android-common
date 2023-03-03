@@ -15,7 +15,9 @@ import org.json.JSONObject
 
 @OptIn(DelicateCoroutinesApi::class)
 class CherrySocketClient(
-    val userHolder: UserHolder
+    val userHolder: UserHolder,
+    val onSocketConnected: () -> Unit,
+    val onSocketDisconnected: () -> Unit
 ) {
 
     private val TAG = CherrySocketClient::class.java.simpleName
@@ -31,7 +33,6 @@ class CherrySocketClient(
     init {
         GlobalScope.launch(Dispatchers.Main) {
             listen().collect {
-                Log.d("Socket", Thread.currentThread().name)
                 try {
                     val command = JSONObject(it[0].toString())
                     val type = command.optString("type")
@@ -39,17 +40,25 @@ class CherrySocketClient(
                     val machineNumber = command.optString("machineNumber")
                     val streamingAddress = command.optString("streamUrl")
                     val credit = command.optInt("credit")
+                    val status = command.optString("status")
+                    val timer = command.optInt("timer")
 
-                    Log.d("Socket", type)
-                    Log.d("Socket", networkCameraAddress)
-                    Log.d("Socket", machineNumber)
-                    Log.d("Socket", streamingAddress)
-                    Log.d("Socket", credit.toString())
+//                    Log.d(TAG, "type = $type")
+//                    Log.d("Socket", "networkCameraAddress = $networkCameraAddress")
+//                    Log.d("Socket", "machineNumber = $machineNumber")
+//                    Log.d("Socket", "streamingAddress = $streamingAddress")
+//                    Log.d("Socket", "credit = $credit")
+//                    Log.d("Socket", "status = $status")
 
 
                     when (type) {
                         SocketMessageType.SS.name -> {
-                            Broadcast.refreshMachineEvent.emit(Unit)
+                            Log.d(TAG, timer.toString())
+                            Broadcast.machineStatusChange.emit(MachineStatusValue(
+                                status = status,
+                                timer = timer,
+                                machineNumber = machineNumber,
+                            ))
                         }
                         SocketMessageType.NC.name -> {
                             Broadcast.notifyCreditEvent.emit(credit)
@@ -64,7 +73,6 @@ class CherrySocketClient(
                             Broadcast.creditOutEvent.emit(credit)
                         }
                         SocketMessageType.HS.name -> {
-                            Log.d("Socket", "가즈아")
                             Broadcast.holdSlotNetworking.emit(false)
                             Broadcast.holdSlotEvent.emit(
                                 HoldSlotValue(
@@ -75,10 +83,12 @@ class CherrySocketClient(
                                 )
                             )
                         }
+                        SocketMessageType.ALL_BREAK_OUT.name -> {
+                            Broadcast.allBreakOutEvent.emit(Unit)
+                        }
 
                     }
                 } catch (e: Throwable){
-
                 }
             }
         }
@@ -90,16 +100,18 @@ class CherrySocketClient(
 
         socket.on(io.socket.client.Socket.EVENT_CONNECT) {
             // 소켓 서버에 연결이 성공하면 호출됩니다.
+            onSocketConnected()
             Log.i("Socket", "Connect")
         }.on(io.socket.client.Socket.EVENT_DISCONNECT) { args ->
             // 소켓 서버 연결이 끊어질 경우에 호출됩니다.
+            onSocketDisconnected()
             Log.i("Socket", "Disconnet: ${args[0]}")
         }.on(EVENT_CONNECT_ERROR) { args ->
             socket.connect()
             Log.i("Socket", "Connect Error: ${args[0]}")
         }.on("events") {
             it.forEach { value ->
-                Log.d("Socket", value.toString())
+                Log.d(TAG, value.toString())
             }
             trySend(it)
         }
@@ -117,14 +129,13 @@ object Broadcast {
     val creditOutEvent = MutableSharedFlow<Int>()
     val userRefreshEvent = MutableSharedFlow<Unit>()
     val holdSlotNetworking = MutableStateFlow(false)
-    val refreshMachineEvent = MutableSharedFlow<Unit>()
-    val machineStatusChange = MutableSharedFlow<String>()
+    val machineStatusChange = MutableSharedFlow<MachineStatusValue>()
+    val allBreakOutEvent = MutableSharedFlow<Unit>()
 }
 
 enum class SocketMessageType {
-    IC, OC, HS, RS, SS, NC
+    IC, OC, HS, RS, SS, NC, ALL_BREAK_OUT
 }
-
 
 
 @Parcelize
@@ -133,4 +144,11 @@ data class HoldSlotValue(
     val streamUrl: String,
     val machineNumber: String,
     val credit: Int,
-) : Parcelable
+    var timer: Int = 0,
+): Parcelable
+
+data class MachineStatusValue(
+    val status: String,
+    val timer: Int,
+    val machineNumber: String,
+)
