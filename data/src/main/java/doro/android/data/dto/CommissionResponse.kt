@@ -9,6 +9,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class CommissionResponse(
+    @SerializedName("id")
+    val id: Int,
+
     @SerializedName("commission")
     val commission: Int,
 
@@ -20,6 +23,7 @@ data class CommissionResponse(
 ) : Parcelable {
     fun toDomain(): Commission {
         return Commission(
+            id = this.id,
             commission = this.commission,
             status = this.status,
             agent = this.agent?.toDomain(),
