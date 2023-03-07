@@ -19,7 +19,10 @@ data class CommissionResponse(
     val status: CommissionStatus,
 
     @SerializedName("agent")
-    val agent: AgentResponse?
+    val agent: AgentResponse?,
+
+    @SerializedName("credit")
+    val credit: Int,
 ) : Parcelable {
     fun toDomain(): Commission {
         return Commission(
@@ -27,6 +30,7 @@ data class CommissionResponse(
             commission = this.commission,
             status = this.status,
             agent = this.agent?.toDomain(),
+            credit = this.credit,
         )
     }
 }
