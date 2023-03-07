@@ -68,4 +68,9 @@ class ApiModule {
     fun provideJumbotronService(retrofit: Retrofit): JumbotronService =
         retrofit.create(JumbotronService::class.java)
 
+    @Singleton
+    @Provides
+    fun provideCommissionService(retrofit: Retrofit): CommissionService =
+        retrofit.create(CommissionService::class.java)
+
 }

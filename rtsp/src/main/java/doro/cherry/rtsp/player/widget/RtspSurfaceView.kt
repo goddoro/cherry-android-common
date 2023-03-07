@@ -320,7 +320,7 @@ open class RtspSurfaceView: SurfaceView {
 
     companion object {
         private val TAG: String = RtspSurfaceView::class.java.simpleName
-        private const val DEBUG = false
+        private const val DEBUG = true
         private const val DEFAULT_RTSP_PORT = 554
     }
 

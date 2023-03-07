@@ -67,4 +67,9 @@ abstract class RepositoryModule {
     abstract fun bindJumbotronRepository(
         jumbotronRepositoryImpl: JumbotronRepositoryImpl
     ): JumbotronRepository
+
+    @Binds
+    abstract fun bindCommissionRepository(
+        commissionRepositoryImpl: CommissionRepositoryImpl
+    ): CommissionRepository
 }

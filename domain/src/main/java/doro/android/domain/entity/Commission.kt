@@ -1,0 +1,11 @@
+package doro.android.domain.entity
+
+data class Commission(
+    val commission: Int,
+    val agent: Agent?,
+    val status: CommissionStatus
+)
+
+enum class CommissionStatus {
+    PENDING, APPROVED, COMPLETED, REJECTED
+}
