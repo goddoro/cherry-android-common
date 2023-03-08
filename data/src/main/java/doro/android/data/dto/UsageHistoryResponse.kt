@@ -9,20 +9,21 @@ import kotlinx.parcelize.Parcelize
 data class UsageHistoryResponse(
     @SerializedName("id")
     val id: Int,
+    @SerializedName("startTime")
+    val startTime: String,
     @SerializedName("machine")
     val machine: MachineResponse,
-    @SerializedName("createdAt")
-    val createdAt: String,
     @SerializedName("endTime")
     val endTime: String?,
     @SerializedName("credit")
     val credit: Int,
+
 ) : Parcelable {
     fun toDomain(): UsageHistory {
         return UsageHistory(
             id = id,
             machine = machine.toDomain(),
-            createdAt = createdAt,
+            createdAt = startTime,
             endTime = endTime,
             credit = credit,
         )
