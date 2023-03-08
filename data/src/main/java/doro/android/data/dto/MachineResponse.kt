@@ -12,7 +12,7 @@ data class MachineResponse(
     val id: Int,
 
     @SerializedName("status")
-    val status: MachineStatus,
+    val status: MachineStatus?,
 
     @SerializedName("number")
     val number: String,
