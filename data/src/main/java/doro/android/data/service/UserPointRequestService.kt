@@ -6,7 +6,7 @@ import retrofit2.http.*
 interface UserPointRequestService {
 
     @GET("/user-point-request")
-    suspend fun fetchList(@QueryMap query: FindUserPointRequest): PointRequestsResponse
+    suspend fun fetchList(@Query("userId") userId: Int?, @Query("agentId") agentId: Int?): PointRequestsResponse
 
     @PATCH("/user-point-request/carry")
     suspend fun carry(@Body body: UserPointRequestCarryRequest): EmptyResponse

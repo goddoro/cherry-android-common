@@ -18,11 +18,7 @@ class UserPointRequestRepositoryImpl @Inject constructor(
         userId: Int?,
         agentId: Int?,
     ): List<UserPointRequest> = withContext(Dispatchers.IO) {
-        val request = FindUserPointRequest(
-            userId = userId,
-            agentId = agentId,
-        )
-        userPointRequestService.fetchList(request).userPointRequests.map { it.toDomain() }
+        userPointRequestService.fetchList(userId = userId, agentId = agentId).userPointRequests.map { it.toDomain() }
     }
 
     override suspend fun findOne(id: Int): UserPointRequest = withContext(Dispatchers.IO) {
