@@ -15,13 +15,16 @@ data class UsageHistoryResponse(
     val createdAt: String,
     @SerializedName("endTime")
     val endTime: String,
+    @SerializedName("credit")
+    val credit: Int,
 ) : Parcelable {
     fun toDomain(): UsageHistory {
         return UsageHistory(
             id = id,
             machine = machine.toDomain(),
             createdAt = createdAt,
-            endTime = endTime
+            endTime = endTime,
+            credit = credit,
         )
     }
 }
