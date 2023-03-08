@@ -73,4 +73,9 @@ class ApiModule {
     fun provideCommissionService(retrofit: Retrofit): CommissionService =
         retrofit.create(CommissionService::class.java)
 
+    @Singleton
+    @Provides
+    fun provideUsageHistoryService(retrofit: Retrofit): UsageHistoryService =
+        retrofit.create(UsageHistoryService::class.java)
+
 }

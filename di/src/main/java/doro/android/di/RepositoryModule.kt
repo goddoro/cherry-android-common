@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import doro.android.data.dto.FcmPushRepositoryImpl
+import doro.android.data.dto.UsageHistoryResponse
 import doro.android.data.repository.*
 import doro.android.domain.repository.*
 
@@ -72,4 +73,9 @@ abstract class RepositoryModule {
     abstract fun bindCommissionRepository(
         commissionRepositoryImpl: CommissionRepositoryImpl
     ): CommissionRepository
+
+    @Binds
+    abstract fun bindUsageHistoryRepository(
+        usageHistoryRepositoryImpl: UsageHistoryRepositoryImpl
+    ): UsageHistoryRepository
 }
