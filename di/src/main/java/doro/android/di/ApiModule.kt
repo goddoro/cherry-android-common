@@ -78,4 +78,9 @@ class ApiModule {
     fun provideUsageHistoryService(retrofit: Retrofit): UsageHistoryService =
         retrofit.create(UsageHistoryService::class.java)
 
+    @Singleton
+    @Provides
+    fun providePointRequestService(retrofit: Retrofit): UserPointRequestService =
+        retrofit.create(UserPointRequestService::class.java)
+
 }

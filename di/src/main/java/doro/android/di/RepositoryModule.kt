@@ -78,4 +78,9 @@ abstract class RepositoryModule {
     abstract fun bindUsageHistoryRepository(
         usageHistoryRepositoryImpl: UsageHistoryRepositoryImpl
     ): UsageHistoryRepository
+
+    @Binds
+    abstract fun bindUserPointRequestRepository(
+        userPointRequestRepositoryImpl: UserPointRequestRepositoryImpl
+    ): UserPointRequestRepository
 }
