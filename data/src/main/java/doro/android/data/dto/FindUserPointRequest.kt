@@ -11,6 +11,4 @@ data class FindUserPointRequest(
     val userId: Int? = null,
     @SerializedName("agentId")
     val agentId: Int? = null,
-    @SerializedName("type")
-    val type: PointRequestType
 ): Parcelable
