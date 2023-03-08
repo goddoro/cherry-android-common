@@ -14,7 +14,7 @@ data class UsageHistoryResponse(
     @SerializedName("createdAt")
     val createdAt: String,
     @SerializedName("endTime")
-    val endTime: String,
+    val endTime: String?,
     @SerializedName("credit")
     val credit: Int,
 ) : Parcelable {
