@@ -5,5 +5,6 @@ data class UsageHistory(
     val machine: Machine,
     val createdAt: String,
     val endTime: String?,
-    val credit: Int,
+    val before: Int,
+    val after: Int
 )
