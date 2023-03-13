@@ -35,6 +35,7 @@ class CherrySocketClient(
             listen().collect {
                 try {
                     val command = JSONObject(it[0].toString())
+                    val success = command.optBoolean("success")
                     val type = command.optString("type")
                     val networkCameraAddress = command.optString("cameraUrl")
                     val machineNumber = command.optString("machineNumber")
@@ -50,43 +51,48 @@ class CherrySocketClient(
 //                    Log.d("Socket", "credit = $credit")
 //                    Log.d("Socket", "status = $status")
 
-
-                    when (type) {
-                        SocketMessageType.SS.name -> {
-                            Log.d(TAG, timer.toString())
-                            Broadcast.machineStatusChange.emit(MachineStatusValue(
-                                status = status,
-                                timer = timer,
-                                machineNumber = machineNumber,
-                            ))
-                        }
-                        SocketMessageType.NC.name -> {
-                            Broadcast.notifyCreditEvent.emit(credit)
-                        }
-                        SocketMessageType.RS.name -> {
-                            Broadcast.releaseSlotEvent.emit(credit)
-                        }
-                        SocketMessageType.IC.name -> {
-                            Broadcast.creditInEvent.emit(credit)
-                        }
-                        SocketMessageType.OC.name -> {
-                            Broadcast.creditOutEvent.emit(credit)
-                        }
-                        SocketMessageType.HS.name -> {
-                            Broadcast.holdSlotNetworking.emit(false)
-                            Broadcast.holdSlotEvent.emit(
-                                HoldSlotValue(
-                                    cameraUrl = networkCameraAddress,
-                                    streamUrl = streamingAddress,
-                                    machineNumber = machineNumber,
-                                    credit = credit,
+                    if (!success) {
+                        Broadcast.machineResponseFail.emit(Unit)
+                    } else {
+                        when (type) {
+                            SocketMessageType.SS.name -> {
+                                Log.d(TAG, timer.toString())
+                                Broadcast.machineStatusChange.emit(
+                                    MachineStatusValue(
+                                        status = status,
+                                        timer = timer,
+                                        machineNumber = machineNumber,
+                                    )
                                 )
-                            )
-                        }
-                        SocketMessageType.ALL_BREAK_OUT.name -> {
-                            Broadcast.allBreakOutEvent.emit(Unit)
-                        }
+                            }
+                            SocketMessageType.NC.name -> {
+                                Broadcast.notifyCreditEvent.emit(credit)
+                            }
+                            SocketMessageType.RS.name -> {
+                                Broadcast.releaseSlotEvent.emit(credit)
+                            }
+                            SocketMessageType.IC.name -> {
+                                Broadcast.creditInEvent.emit(credit)
+                            }
+                            SocketMessageType.OC.name -> {
+                                Broadcast.creditOutEvent.emit(credit)
+                            }
+                            SocketMessageType.HS.name -> {
+                                Broadcast.holdSlotNetworking.emit(false)
+                                Broadcast.holdSlotEvent.emit(
+                                    HoldSlotValue(
+                                        cameraUrl = networkCameraAddress,
+                                        streamUrl = streamingAddress,
+                                        machineNumber = machineNumber,
+                                        credit = credit,
+                                    )
+                                )
+                            }
+                            SocketMessageType.ALL_BREAK_OUT.name -> {
+                                Broadcast.allBreakOutEvent.emit(Unit)
+                            }
 
+                        }
                     }
                 } catch (e: Throwable){
                 }
@@ -131,6 +137,7 @@ object Broadcast {
     val holdSlotNetworking = MutableStateFlow(false)
     val machineStatusChange = MutableSharedFlow<MachineStatusValue>()
     val allBreakOutEvent = MutableSharedFlow<Unit>()
+    val machineResponseFail = MutableSharedFlow<Unit>()
 }
 
 enum class SocketMessageType {
