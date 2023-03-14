@@ -11,6 +11,7 @@ interface MachineRepository {
     suspend fun releaseSlot(machineNumber: String)
     suspend fun pressButton(machineNumber: String, button: GameButton)
     suspend fun selectEvent(machineNumber: String, eventNumber: Int)
+    suspend fun customService(machineNumber: String, customServiceCode: Int)
     suspend fun searchOccupied(): String?
     suspend fun findOne(number: String): Machine
 }

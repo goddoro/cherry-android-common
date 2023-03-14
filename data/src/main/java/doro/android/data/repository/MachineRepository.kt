@@ -87,6 +87,17 @@ class MachineRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun customService(machineNumber: String, customServiceCode: Int) {
+        withContext(Dispatchers.IO){
+            val request = MachineCommandRequest(
+                endPoint = "CS",
+                machineNumber = machineNumber,
+                customServiceCode = customServiceCode,
+            )
+            machineService.command(request)
+        }
+    }
+
     override suspend fun searchOccupied(): String? =
         withContext(Dispatchers.IO) {
             machineService.searchOccupied().number
