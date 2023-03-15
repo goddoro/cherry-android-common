@@ -56,7 +56,6 @@ class CherrySocketClient(
                     } else {
                         when (type) {
                             SocketMessageType.SS.name -> {
-                                Log.d(TAG, timer.toString())
                                 Broadcast.machineStatusChange.emit(
                                     MachineStatusValue(
                                         status = status,
