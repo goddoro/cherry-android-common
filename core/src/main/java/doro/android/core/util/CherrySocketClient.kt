@@ -91,6 +91,10 @@ class CherrySocketClient(
                                 Broadcast.allBreakOutEvent.emit(Unit)
                             }
 
+                            SocketMessageType.FORCE_LOG_OUT.name -> {
+                                Broadcast.forceLogOut.emit(Unit)
+                            }
+
                         }
                     }
                 } catch (e: Throwable){
@@ -137,10 +141,11 @@ object Broadcast {
     val machineStatusChange = MutableSharedFlow<MachineStatusValue>()
     val allBreakOutEvent = MutableSharedFlow<Unit>()
     val machineResponseFail = MutableSharedFlow<Unit>()
+    val forceLogOut = MutableSharedFlow<Unit>()
 }
 
 enum class SocketMessageType {
-    IC, OC, HS, RS, SS, NC, ALL_BREAK_OUT
+    IC, OC, HS, RS, SS, NC, ALL_BREAK_OUT, FORCE_LOG_OUT
 }
 
 
