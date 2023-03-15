@@ -11,7 +11,7 @@ class UsageHistoryRepositoryImpl @Inject constructor(
     private val usageHistoryService: UsageHistoryService
 ) : UsageHistoryRepository {
 
-    override suspend fun fetch(): List<UsageHistory> = withContext(Dispatchers.IO) {
-        usageHistoryService.fetch().usageHistories.map { it.toDomain() }
+    override suspend fun fetch(startDate: String, endDate: String): List<UsageHistory> = withContext(Dispatchers.IO) {
+        usageHistoryService.fetch(startDate, endDate).usageHistories.map { it.toDomain() }
     }
 }
