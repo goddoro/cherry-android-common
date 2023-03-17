@@ -94,10 +94,10 @@ class CherrySocketClient(
                             SocketMessageType.FORCE_LOG_OUT.name -> {
                                 Broadcast.forceLogOut.emit(Unit)
                             }
-
                         }
                     }
                 } catch (e: Throwable){
+
                 }
             }
         }
