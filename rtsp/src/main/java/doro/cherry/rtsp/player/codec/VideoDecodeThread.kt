@@ -112,6 +112,8 @@ class VideoDecodeThread(
                                 outIndex,
                                 bufferInfo.size != 0 && !exitFlag.get()
                             )
+                        } else {
+                            if (DEBUG) Log.d(TAG, "out index is negative value")
                         }
                     }
                 }

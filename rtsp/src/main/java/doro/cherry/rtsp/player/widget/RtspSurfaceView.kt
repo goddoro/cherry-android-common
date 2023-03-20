@@ -30,10 +30,10 @@ open class RtspSurfaceView: SurfaceView {
     private var requestVideo = true
     private var requestAudio = true
     private var rtspThread: RtspThread? = null
-    private var videoFrameQueue = FrameQueue("video",60) {
+    private var videoFrameQueue = FrameQueue("video",10) {
         onRtspFrameQueueError(it)
     }
-    private var audioFrameQueue = FrameQueue("audio", 60000) {
+    private var audioFrameQueue = FrameQueue("audio", 10) {
         onRtspFrameQueueError(it)
     }
     private var videoDecodeThread: VideoDecodeThread? = null
@@ -329,7 +329,7 @@ open class RtspSurfaceView: SurfaceView {
 
     companion object {
         private val TAG: String = RtspSurfaceView::class.java.simpleName
-        private const val DEBUG = true
+        private const val DEBUG = false
         private const val DEFAULT_RTSP_PORT = 554
     }
 
