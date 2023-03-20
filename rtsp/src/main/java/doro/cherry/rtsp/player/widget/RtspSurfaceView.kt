@@ -30,10 +30,10 @@ open class RtspSurfaceView: SurfaceView {
     private var requestVideo = true
     private var requestAudio = true
     private var rtspThread: RtspThread? = null
-    private var videoFrameQueue = FrameQueue("Video",60) {
+    private var videoFrameQueue = FrameQueue("video",60) {
         onRtspFrameQueueError(it)
     }
-    private var audioFrameQueue = FrameQueue("Audio", 60000) {
+    private var audioFrameQueue = FrameQueue("audio", 60000) {
         onRtspFrameQueueError(it)
     }
     private var videoDecodeThread: VideoDecodeThread? = null

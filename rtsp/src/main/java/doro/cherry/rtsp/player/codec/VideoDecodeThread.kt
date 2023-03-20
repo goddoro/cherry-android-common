@@ -97,10 +97,6 @@ class VideoDecodeThread (
                         if (DEBUG) Log.d(
                             TAG, "No output from decoder available"
                         )
-                        if (!errorInvoked){
-                            onVideoDecodeError("No output from decoder available")
-                            errorInvoked = true
-                        }
                     }
                     else -> {
                         if (outIndex >= 0) {

@@ -23,7 +23,7 @@ class FrameQueue(val type: String, val frameQueueSize: Int, val onFrameQueueErro
             return true
         }
         if (!errorOccurred) {
-            onFrameQueueError("$type Can not push, queue is full")
+            onFrameQueueError("$type can not push, queue is full")
             errorOccurred = true
         }
         Log.w(TAG, "Cannot add frame, queue is full")
@@ -36,16 +36,12 @@ class FrameQueue(val type: String, val frameQueueSize: Int, val onFrameQueueErro
             val frame: Frame? = queue.poll(100, TimeUnit.MILLISECONDS)
             if (frame == null) {
                 Log.w(TAG, "Cannot get frame, queue is empty")
-                if (!errorOccurred) {
-                    onFrameQueueError("$type Can not pop, frame is null")
-                    errorOccurred = true
-                }
             }
             return frame
         } catch (e: InterruptedException) {
             Log.w(TAG, "Cannot add frame, queue is full", e)
             if (!errorOccurred) {
-                onFrameQueueError("$type Can not pop, frame is null in Interuupt!")
+                onFrameQueueError("$type can not pop, frame is null in Interrupt!")
                 errorOccurred = true
             }
             Thread.currentThread().interrupt()
