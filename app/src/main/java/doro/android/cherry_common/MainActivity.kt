@@ -150,13 +150,6 @@ private fun RtspClientScreen(
                     Log.d(TAG, "onRtspStatusFailedUnauthorized")
                 }
             })
-            setErrorListener(object: RtspSurfaceView.RtspErrorListener{
-                override fun onBufferMax() {
-                    coroutineScope.launch {
-                        logRepository.sendStreamingBugEvent("Video Buffer Max")
-                    }
-                }
-            })
         }
     }
     val count = remember { mutableStateOf((0))}

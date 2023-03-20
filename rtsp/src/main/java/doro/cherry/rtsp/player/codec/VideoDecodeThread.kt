@@ -17,9 +17,11 @@ class VideoDecodeThread (
     private val height: Int,
     private val videoFrameQueue: FrameQueue,
     private val onFrameRenderedListener: OnFrameRenderedListener,
+    val onVideoDecodeError: (String) -> Unit,
 ) : Thread() {
 
     private var exitFlag: AtomicBoolean = AtomicBoolean(false)
+    private var errorInvoked: Boolean = false
 
     fun stopAsync() {
         if (DEBUG) Log.v(TAG, "stopAsync()")
@@ -91,9 +93,15 @@ class VideoDecodeThread (
                         TAG,
                         "Decoder format changed: ${decoder.outputFormat}"
                     )
-                    MediaCodec.INFO_TRY_AGAIN_LATER -> if (DEBUG) Log.d(
-                        TAG, "No output from decoder available"
-                    )
+                    MediaCodec.INFO_TRY_AGAIN_LATER -> {
+                        if (DEBUG) Log.d(
+                            TAG, "No output from decoder available"
+                        )
+                        if (!errorInvoked){
+                            onVideoDecodeError("No output from decoder available")
+                            errorInvoked = true
+                        }
+                    }
                     else -> {
                         if (outIndex >= 0) {
                             decoder.releaseOutputBuffer(
@@ -126,6 +134,10 @@ class VideoDecodeThread (
 
         } catch (e: Exception) {
             Log.e(TAG, "$name stopped due to '${e.message}'")
+            if (!errorInvoked){
+                onVideoDecodeError("$name stopped due to '${e.message}'")
+                errorInvoked = true
+            }
             // While configuring stopAsync can be called and surface released. Just exit.
             if (!exitFlag.get()) e.printStackTrace()
             return

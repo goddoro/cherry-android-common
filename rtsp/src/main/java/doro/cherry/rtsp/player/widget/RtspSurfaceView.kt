@@ -30,10 +30,12 @@ open class RtspSurfaceView: SurfaceView {
     private var requestVideo = true
     private var requestAudio = true
     private var rtspThread: RtspThread? = null
-    private var videoFrameQueue = FrameQueue(60) {
-        onBufferMax()
+    private var videoFrameQueue = FrameQueue("Video",60) {
+        onRtspFrameQueueError(it)
     }
-    private var audioFrameQueue = FrameQueue(60000)
+    private var audioFrameQueue = FrameQueue("Audio", 60000) {
+        onRtspFrameQueueError(it)
+    }
     private var videoDecodeThread: VideoDecodeThread? = null
     private var audioDecodeThread: AudioDecodeThread? = null
     private var surfaceWidth = 960
@@ -62,7 +64,8 @@ open class RtspSurfaceView: SurfaceView {
     }
 
     interface RtspErrorListener {
-        fun onBufferMax()
+        fun onFrameQueueError(message: String)
+        fun onVideDecoderError(message: String)
     }
 
     private val proxyClientListener = object: RtspClient.RtspClientListener {
@@ -154,7 +157,9 @@ open class RtspSurfaceView: SurfaceView {
                 }
             Log.i(TAG, "Starting video decoder with mime type \"$videoMimeType\"")
             videoDecodeThread = VideoDecodeThread(
-                surface, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener)
+                surface, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener) {
+                onRtspVideoDecoderError(it)
+            }
             videoDecodeThread!!.name = "RTSP video thread [${getUriName()}]"
             videoDecodeThread!!.start()
         }
@@ -314,8 +319,12 @@ open class RtspSurfaceView: SurfaceView {
         return "${uri.host.toString()}:$port"
     }
 
-    private fun onBufferMax(){
-        errorListener?.onBufferMax()
+    private fun onRtspFrameQueueError(message: String){
+        errorListener?.onFrameQueueError(message)
+    }
+
+    private fun onRtspVideoDecoderError(error: String){
+        errorListener?.onVideDecoderError(error)
     }
 
     companion object {
