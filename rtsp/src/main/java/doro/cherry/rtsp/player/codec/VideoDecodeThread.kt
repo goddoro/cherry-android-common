@@ -21,7 +21,6 @@ class VideoDecodeThread(
 
     private var exitFlag: AtomicBoolean = AtomicBoolean(false)
     private var errorInvoked: Boolean = false
-    private var infoTryAgainLaterCount = 0
 
     fun stopAsync() {
         if (DEBUG) Log.v(TAG, "stopAsync()")
@@ -105,10 +104,6 @@ class VideoDecodeThread(
                         if (DEBUG) Log.d(
                             TAG, "No output from decoder available"
                         )
-                        infoTryAgainLaterCount++
-                        if (infoTryAgainLaterCount == 100){
-                            onVideoDecodeError("no output from decoder available")
-                        }
                     }
                     else -> {
                         if (outIndex >= 0) {
