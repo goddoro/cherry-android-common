@@ -50,18 +50,15 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.size(400.dp)
             ) {
                 val videoUrl =
-                    remember { mutableStateOf("https://storage.googleapis.com/gtv-videos-bucket/sample/BasdfafigBuckBunny.mp4") }
+                    remember { mutableStateOf("rtsp://admin:Cherry11!\$@61.72.138.120:552/live") }
                 Row {
 
-//                    if ( videoUrl.value != "") {
-//                        RtspClientScreen(
-//                            videoUrl = videoUrl.value,
-//                            logRepository = logRepository,
-//                        )
-//                    }
-                    ExoPlayerScreen(
+
+                    RtspClientScreen(
                         videoUrl = videoUrl.value,
+                        logRepository = logRepository,
                     )
+
                 }
                 Text(text = "on/off", modifier = Modifier.clickable {
                     if (videoUrl.value == ""){

@@ -6,11 +6,10 @@ import android.media.MediaFormat
 import android.util.Log
 import android.view.Surface
 import com.google.android.exoplayer2.util.Util
-import doro.cherry.rtsp.player.widget.RtspSurfaceView
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 
-class VideoDecodeThread (
+class VideoDecodeThread(
     private val surface: Surface,
     private val mimeType: String,
     private val width: Int,
@@ -22,6 +21,7 @@ class VideoDecodeThread (
 
     private var exitFlag: AtomicBoolean = AtomicBoolean(false)
     private var errorInvoked: Boolean = false
+    private var infoTryAgainLaterCount = 0
 
     fun stopAsync() {
         if (DEBUG) Log.v(TAG, "stopAsync()")
@@ -39,7 +39,8 @@ class VideoDecodeThread (
             val heightAlignment = capabilities.heightAlignment
             Pair(
                 Util.ceilDivide(width, widthAlignment) * widthAlignment,
-                Util.ceilDivide(height, heightAlignment) * heightAlignment)
+                Util.ceilDivide(height, heightAlignment) * heightAlignment
+            )
         }
     }
 
@@ -49,7 +50,8 @@ class VideoDecodeThread (
         try {
             val decoder = MediaCodec.createDecoderByType(mimeType)
             val widthHeight = getDecoderSafeWidthHeight(decoder)
-            val format = MediaFormat.createVideoFormat(mimeType, widthHeight.first, widthHeight.second)
+            val format =
+                MediaFormat.createVideoFormat(mimeType, widthHeight.first, widthHeight.second)
 
             decoder.setOnFrameRenderedListener(onFrameRenderedListener, null)
 
@@ -79,12 +81,18 @@ class VideoDecodeThread (
 
                     val frame = videoFrameQueue.pop()
                     if (frame == null) {
-                        Log.d(TAG, "Empty video frame")
+                        if (DEBUG) Log.d(TAG, "Empty video frame")
                         // Release input buffer
                         decoder.queueInputBuffer(inIndex, 0, 0, 0L, 0)
                     } else {
                         byteBuffer?.put(frame.data, frame.offset, frame.length)
-                        decoder.queueInputBuffer(inIndex, frame.offset, frame.length, frame.timestamp, 0)
+                        decoder.queueInputBuffer(
+                            inIndex,
+                            frame.offset,
+                            frame.length,
+                            frame.timestamp,
+                            0
+                        )
                     }
                 }
                 if (exitFlag.get()) break
@@ -97,9 +105,14 @@ class VideoDecodeThread (
                         if (DEBUG) Log.d(
                             TAG, "No output from decoder available"
                         )
+                        infoTryAgainLaterCount++
+                        if (infoTryAgainLaterCount == 100){
+                            onVideoDecodeError("no output from decoder available")
+                        }
                     }
                     else -> {
                         if (outIndex >= 0) {
+                            if (DEBUG) Log.d(TAG, "release output buffer ${bufferInfo.size}")
                             decoder.releaseOutputBuffer(
                                 outIndex,
                                 bufferInfo.size != 0 && !exitFlag.get()
@@ -130,7 +143,7 @@ class VideoDecodeThread (
 
         } catch (e: Exception) {
             Log.e(TAG, "$name stopped due to '${e.message}'")
-            if (!errorInvoked){
+            if (!errorInvoked) {
                 onVideoDecodeError("$name stopped due to '${e.message}'")
                 errorInvoked = true
             }
