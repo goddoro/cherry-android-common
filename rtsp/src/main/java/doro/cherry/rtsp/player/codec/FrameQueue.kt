@@ -40,10 +40,6 @@ class FrameQueue(val type: String, val frameQueueSize: Int, val onFrameQueueErro
             return frame
         } catch (e: InterruptedException) {
             Log.w(TAG, "Cannot add frame, queue is full", e)
-            if (!errorOccurred) {
-                onFrameQueueError("$type can not pop, frame is null in Interrupt!")
-                errorOccurred = true
-            }
             Thread.currentThread().interrupt()
         }
         return null
