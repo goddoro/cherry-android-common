@@ -30,13 +30,13 @@ open class RtspSurfaceView: SurfaceView {
     private var requestVideo = true
     private var requestAudio = true
     private var rtspThread: RtspThread? = null
-    private var videoFrameQueue = FrameQueue("video",10) {
+    private var videoFrameQueue = FrameQueue("video",60000) {
         onRtspFrameQueueError(it)
     }
-    private var audioFrameQueue = FrameQueue("audio", 10) {
+    private var audioFrameQueue = FrameQueue("audio", 60000) {
         onRtspFrameQueueError(it)
     }
-    private var videoDecodeThread: VideoDecodeThread? = null
+    var videoDecodeThread: VideoDecodeThread? = null
     private var audioDecodeThread: AudioDecodeThread? = null
     private var surfaceWidth = 960
     private var surfaceHeight = 540
@@ -49,6 +49,19 @@ open class RtspSurfaceView: SurfaceView {
     private var audioChannelCount: Int = 0
     private var audioCodecConfig: ByteArray? = null
     private var firstFrameRendered = false
+    private var surface: Surface? = null
+    var surfaceChangeCount = 0
+    var surfaceDestroyed = false
+
+    var currentOrder = 0
+    var surfaceCreated = 0
+    var surfaceChanged = 0
+    var videoStart = 0
+    var rtspConnected = 0
+
+    var initVideoFrameCount = 0
+    var videoFrameCount = 0
+    var audioFrameCount = 0
 
     fun getVideoFrameQueue() = this.videoFrameQueue
 
@@ -78,6 +91,7 @@ open class RtspSurfaceView: SurfaceView {
         }
 
         override fun onRtspConnected(sdpInfo: RtspClient.SdpInfo) {
+            rtspConnected = ++currentOrder
             if (DEBUG) Log.v(TAG, "onRtspConnected()")
             if (sdpInfo.videoTrack != null) {
                 videoFrameQueue.clear()
@@ -95,10 +109,14 @@ open class RtspSurfaceView: SurfaceView {
                     val data = ByteArray(sps.size + pps.size)
                     sps.copyInto(data, 0, 0, sps.size)
                     pps.copyInto(data, sps.size, 0, pps.size)
+                    initVideoFrameCount++
                     videoFrameQueue.push(FrameQueue.Frame(data, 0, data.size, 0))
                 } else {
                     if (DEBUG) Log.d(TAG, "RTSP SPS and PPS NAL units missed in SDP")
                 }
+            }
+            if ( rtspConnected != 0 && surfaceCreated != 0) {
+                videoStart()
             }
             if (sdpInfo.audioTrack != null) {
                 audioFrameQueue.clear()
@@ -109,6 +127,7 @@ open class RtspSurfaceView: SurfaceView {
                 audioChannelCount = sdpInfo.audioTrack?.channels!!
                 audioCodecConfig = sdpInfo.audioTrack?.config
             }
+
             audioStart()
             uiHandler.post {
                 statusListener?.onRtspStatusConnected()
@@ -116,11 +135,17 @@ open class RtspSurfaceView: SurfaceView {
         }
 
         override fun onRtspVideoNalUnitReceived(data: ByteArray, offset: Int, length: Int, timestamp: Long) {
-            if (length > 0) videoFrameQueue.push(FrameQueue.Frame(data, offset, length, timestamp))
+            if (length > 0) {
+                videoFrameCount++
+                videoFrameQueue.push(FrameQueue.Frame(data, offset, length, timestamp))
+            }
         }
 
         override fun onRtspAudioSampleReceived(data: ByteArray, offset: Int, length: Int, timestamp: Long) {
-            if (length > 0) audioFrameQueue.push(FrameQueue.Frame(data, offset, length, timestamp))
+            if (length > 0) {
+                audioFrameCount++
+                audioFrameQueue.push(FrameQueue.Frame(data, offset, length, timestamp))
+            }
         }
 
         override fun onRtspDisconnected() {
@@ -147,8 +172,9 @@ open class RtspSurfaceView: SurfaceView {
         }
     }
 
-    private fun videoStart(surface: Surface){
-        if (videoMimeType.isNotEmpty()) {
+    private fun videoStart(){
+        videoStart = ++currentOrder
+        if (videoMimeType.isNotEmpty() && surface != null) {
             firstFrameRendered = false
             val onFrameRenderedListener =
                 MediaCodec.OnFrameRenderedListener { _, _, _ ->
@@ -157,14 +183,12 @@ open class RtspSurfaceView: SurfaceView {
                 }
             Log.i(TAG, "Starting video decoder with mime type \"$videoMimeType\"")
             videoDecodeThread = VideoDecodeThread(
-                surface, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener) {
+                surface!!, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener) {
                 onRtspVideoDecoderError(it)
             }
             videoDecodeThread!!.name = "RTSP video thread [${getUriName()}]"
             videoDecodeThread!!.start()
         }
-
-
     }
 
     private fun audioStart() {
@@ -180,21 +204,33 @@ open class RtspSurfaceView: SurfaceView {
 
    private val surfaceCallback = object: SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
+            surfaceCreated = ++currentOrder
             if (DEBUG) Log.v(TAG, "surfaceCreated()")
-            videoStart(holder.surface)
+            surface = holder.surface
+            if ( rtspConnected != 0 && surfaceCreated != 0) {
+                videoStart()
+            }
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            surfaceChanged = ++currentOrder
             if (DEBUG) Log.v(TAG, "surfaceChanged(format=$format, width=$width, height=$height)")
+            ++surfaceChangeCount
+            surface = holder.surface
             surfaceWidth = width
             surfaceHeight = height
-
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
             if (DEBUG) Log.v(TAG, "surfaceDestroyed()")
+            surface = holder.surface
+            surfaceDestroyed = true
             stopDecoders()
         }
+    }
+
+    fun getSurfaceIsValid(): Boolean{
+        return surface?.isValid ?: false
     }
 
     constructor(context: Context) : super(context) {
@@ -275,6 +311,7 @@ open class RtspSurfaceView: SurfaceView {
                     .withCredentials(username, password)
                     .build()
                 rtspClient.execute()
+
 
                 NetUtils.closeSocket(socket)
             } catch (e: Exception) {

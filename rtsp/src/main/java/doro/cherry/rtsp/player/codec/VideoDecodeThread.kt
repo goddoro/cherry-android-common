@@ -16,11 +16,25 @@ class VideoDecodeThread(
     private val height: Int,
     private val videoFrameQueue: FrameQueue,
     private val onFrameRenderedListener: OnFrameRenderedListener,
-    val onVideoDecodeError: (String) -> Unit,
+    val onVideoDecodeError: (String) -> Unit = {},
 ) : Thread() {
 
     private var exitFlag: AtomicBoolean = AtomicBoolean(false)
     private var errorInvoked: Boolean = false
+    var currentFrame: FrameQueue.Frame? = null
+    var dequeueInputBufferCount = 0
+    var queueInputBufferCount = 0
+    var dequeueOutputBufferCount = 0
+    var releaseOutputBufferCount = 0
+    var infoOutputFormatChanged = 0
+    var infoTryAgainLater = 0
+    var outIndexNegative = 0
+    var onFrameRenderTime = 0L
+    private val decoder = MediaCodec.createDecoderByType(mimeType)
+
+    private val widthHeight = getDecoderSafeWidthHeight(decoder)
+    private val format =
+        MediaFormat.createVideoFormat(mimeType, widthHeight.first, widthHeight.second)
 
     fun stopAsync() {
         if (DEBUG) Log.v(TAG, "stopAsync()")
@@ -43,15 +57,18 @@ class VideoDecodeThread(
         }
     }
 
+    private fun setDecoderSurface(surface: Surface){
+        decoder.configure(format, surface, null, 0)
+        decoder.setOnFrameRenderedListener({ p0, p1, p2 ->
+            onFrameRenderTime = p2
+        }, null)
+    }
+
     override fun run() {
         if (DEBUG) Log.d(TAG, "$name started")
 
         try {
-            val decoder = MediaCodec.createDecoderByType(mimeType)
-            val widthHeight = getDecoderSafeWidthHeight(decoder)
-            val format =
-                MediaFormat.createVideoFormat(mimeType, widthHeight.first, widthHeight.second)
-
+            decoder.reset()
             decoder.setOnFrameRenderedListener(onFrameRenderedListener, null)
 
             if (DEBUG) Log.d(
@@ -60,7 +77,8 @@ class VideoDecodeThread(
                     decoder.codecInfo.getCapabilitiesForType(mimeType).maxSupportedInstances
                 }"
             )
-            decoder.configure(format, surface, null, 0)
+            ByteBuffer.allocate(width * height * 3 / 2)
+            setDecoderSurface(surface)
 
             // TODO: add scale option (ie: FIT, SCALE_CROP, SCALE_NO_CROP)
             //decoder.setVideoScalingMode(MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
@@ -72,13 +90,14 @@ class VideoDecodeThread(
             // Main loop
             while (!exitFlag.get()) {
                 val inIndex: Int = decoder.dequeueInputBuffer(10000L)
-                if (DEBUG) Log.d(TAG, "inIndex = $inIndex")
+                dequeueInputBufferCount++
                 if (inIndex >= 0) {
                     // fill inputBuffers[inputBufferIndex] with valid data
                     val byteBuffer: ByteBuffer? = decoder.getInputBuffer(inIndex)
                     byteBuffer?.rewind()
 
                     val frame = videoFrameQueue.pop()
+                    currentFrame = frame
                     if (frame == null) {
                         if (DEBUG) Log.d(TAG, "Empty video frame")
                         // Release input buffer
@@ -93,17 +112,21 @@ class VideoDecodeThread(
                             0
                         )
                     }
+                    queueInputBufferCount++
                 }
                 if (exitFlag.get()) break
-                when (val outIndex = decoder.dequeueOutputBuffer(bufferInfo, 10000L)) {
-                    MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> Log.d(
-                        TAG,
-                        "Decoder format changed: ${decoder.outputFormat}"
-                    )
+                val outIndex = decoder.dequeueOutputBuffer(bufferInfo, 10000L)
+                dequeueOutputBufferCount++
+                when (outIndex) {
+                    MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                        Log.d(TAG, "Decoder format changed: ${decoder.outputFormat}")
+                        infoOutputFormatChanged++
+                    }
                     MediaCodec.INFO_TRY_AGAIN_LATER -> {
                         if (DEBUG) Log.d(
                             TAG, "No output from decoder available"
                         )
+                        infoTryAgainLater++
                     }
                     else -> {
                         if (outIndex >= 0) {
@@ -112,8 +135,10 @@ class VideoDecodeThread(
                                 outIndex,
                                 bufferInfo.size != 0 && !exitFlag.get()
                             )
+                            releaseOutputBufferCount++
                         } else {
                             if (DEBUG) Log.d(TAG, "out index is negative value")
+                            outIndexNegative++
                         }
                     }
                 }
@@ -133,6 +158,7 @@ class VideoDecodeThread(
             } else {
                 Log.w(TAG, "Not able to signal end of stream")
             }
+
 
             decoder.stop()
             decoder.release()
