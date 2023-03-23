@@ -116,6 +116,16 @@ class MachineRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             machineService.findOne(number).toDomain()
         }
+
+    override suspend fun getAddress(machineNumber: String) =
+        withContext(Dispatchers.IO) {
+            val request = MachineCommandRequest(
+                endPoint = "GA",
+                machineNumber = machineNumber
+            )
+            machineService.command(request)
+        }
+    }
 }
 
 @Parcelize
