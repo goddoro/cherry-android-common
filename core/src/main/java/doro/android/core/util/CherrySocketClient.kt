@@ -61,6 +61,7 @@ class CherrySocketClient(
                                         status = status,
                                         timer = timer,
                                         machineNumber = machineNumber,
+                                        credit = credit,
                                     )
                                 )
                             }
@@ -78,14 +79,9 @@ class CherrySocketClient(
                             }
                             SocketMessageType.HS.name -> {
                                 Broadcast.holdSlotNetworking.emit(false)
-                                Broadcast.holdSlotEvent.emit(
-                                    HoldSlotValue(
-                                        cameraUrl = networkCameraAddress,
-                                        streamUrl = streamingAddress,
-                                        machineNumber = machineNumber,
-                                        credit = credit,
-                                    )
-                                )
+                            }
+                            SocketMessageType.GA.name -> {
+                                Broadcast.getAddressEvent.emit(Pair(streamingAddress, networkCameraAddress))
                             }
                             SocketMessageType.ALL_BREAK_OUT.name -> {
                                 Broadcast.allBreakOutEvent.emit(Unit)
@@ -133,7 +129,7 @@ object Broadcast {
     val notificationRefreshEvent = MutableSharedFlow<Unit>()
     val notifyCreditEvent = MutableSharedFlow<Int>()
     val releaseSlotEvent = MutableSharedFlow<Int>()
-    val holdSlotEvent = MutableSharedFlow<HoldSlotValue>()
+    val getAddressEvent = MutableSharedFlow<Pair<String,String>>()
     val creditInEvent = MutableSharedFlow<Int>()
     val creditOutEvent = MutableSharedFlow<Int>()
     val userRefreshEvent = MutableSharedFlow<Unit>()
@@ -145,21 +141,15 @@ object Broadcast {
 }
 
 enum class SocketMessageType {
-    IC, OC, HS, RS, SS, NC, ALL_BREAK_OUT, FORCE_LOG_OUT
+    IC, OC, HS, RS, SS, NC, GA, ALL_BREAK_OUT, FORCE_LOG_OUT
 }
 
-
 @Parcelize
-data class HoldSlotValue(
-    val cameraUrl: String,
-    val streamUrl: String,
-    val machineNumber: String,
-    val credit: Int,
-    var timer: Int = 0,
-): Parcelable
-
 data class MachineStatusValue(
     val status: String,
     val timer: Int,
     val machineNumber: String,
-)
+    val credit: Int,
+    var cameraUrl: String? = null,
+    var streamUrl: String? = null,
+): Parcelable
