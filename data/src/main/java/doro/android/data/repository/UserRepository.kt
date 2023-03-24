@@ -27,4 +27,8 @@ class UserRepositoryImpl @Inject constructor(
         userService.update(userId, params).toDomain()
     }
 
+    override suspend fun fetchAll(): List<User> = withContext(Dispatchers.IO) {
+        userService.fetchAll().users.map { it.toDomain() }
+    }
+
 }

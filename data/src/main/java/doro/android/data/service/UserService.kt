@@ -1,5 +1,6 @@
 package doro.android.data.service
 
+import doro.android.data.dto.UserListResponse
 import doro.android.data.dto.UserResponse
 import doro.android.data.dto.UserSearchResponse
 import retrofit2.http.*
@@ -17,5 +18,8 @@ interface UserService {
         @Path("id") userId: Int,
         @FieldMap params: HashMap<String, Any>
     ): UserResponse
+
+    @GET("/users")
+    suspend fun fetchAll(): UserListResponse
 
 }

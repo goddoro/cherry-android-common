@@ -20,3 +20,6 @@ include ':data'
 include ':di'
 include ':rtsp'
 include ':socket'
+
+gradle.ext.exoplayerModulePrefix = 'exoplayer-'
+apply from: file("C:\\Users\\goddoro\\StudioProjects\\ExoPlayer/core_settings.gradle")

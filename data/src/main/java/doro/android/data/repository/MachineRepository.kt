@@ -125,8 +125,8 @@ class MachineRepositoryImpl @Inject constructor(
             )
             machineService.command(request)
         }
-    }
 }
+
 
 @Parcelize
 data class HoldSlotResponse(

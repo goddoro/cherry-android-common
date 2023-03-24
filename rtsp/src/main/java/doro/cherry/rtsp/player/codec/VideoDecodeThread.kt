@@ -7,11 +7,12 @@ import android.util.Log
 import android.view.Surface
 import com.google.android.exoplayer2.util.Util
 import java.nio.ByteBuffer
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 class VideoDecodeThread(
     private val surface: Surface,
-    private val mimeType: String,
+    val mimeType: String,
     private val width: Int,
     private val height: Int,
     private val videoFrameQueue: FrameQueue,
@@ -30,11 +31,8 @@ class VideoDecodeThread(
     var infoTryAgainLater = 0
     var outIndexNegative = 0
     var onFrameRenderTime = 0L
-    private val decoder = MediaCodec.createDecoderByType(mimeType)
+    val decoder = MediaCodec.createByCodecName("c2.android.h263.decoder")
 
-    private val widthHeight = getDecoderSafeWidthHeight(decoder)
-    private val format =
-        MediaFormat.createVideoFormat(mimeType, widthHeight.first, widthHeight.second)
 
     fun stopAsync() {
         if (DEBUG) Log.v(TAG, "stopAsync()")
@@ -57,28 +55,21 @@ class VideoDecodeThread(
         }
     }
 
-    private fun setDecoderSurface(surface: Surface){
-        decoder.configure(format, surface, null, 0)
-        decoder.setOnFrameRenderedListener({ p0, p1, p2 ->
-            onFrameRenderTime = p2
-        }, null)
-    }
-
     override fun run() {
         if (DEBUG) Log.d(TAG, "$name started")
 
         try {
             decoder.reset()
-            decoder.setOnFrameRenderedListener(onFrameRenderedListener, null)
-
+            val widthHeight = getDecoderSafeWidthHeight(decoder)
+            val format =
+                MediaFormat.createVideoFormat(mimeType, widthHeight.first, widthHeight.second)
             if (DEBUG) Log.d(
                 TAG,
                 "Configuring surface ${widthHeight.first}x${widthHeight.second} w/ '$mimeType', max instances: ${
                     decoder.codecInfo.getCapabilitiesForType(mimeType).maxSupportedInstances
                 }"
             )
-            ByteBuffer.allocate(width * height * 3 / 2)
-            setDecoderSurface(surface)
+            decoder.configure(format, surface, null, 0)
 
             // TODO: add scale option (ie: FIT, SCALE_CROP, SCALE_NO_CROP)
             //decoder.setVideoScalingMode(MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
@@ -89,7 +80,7 @@ class VideoDecodeThread(
 
             // Main loop
             while (!exitFlag.get()) {
-                val inIndex: Int = decoder.dequeueInputBuffer(10000L)
+                val inIndex: Int = decoder.dequeueInputBuffer(DEQUEUE_INPUT_TIMEOUT_US)
                 dequeueInputBufferCount++
                 if (inIndex >= 0) {
                     // fill inputBuffers[inputBufferIndex] with valid data
@@ -115,7 +106,7 @@ class VideoDecodeThread(
                     queueInputBufferCount++
                 }
                 if (exitFlag.get()) break
-                val outIndex = decoder.dequeueOutputBuffer(bufferInfo, 10000L)
+                val outIndex = decoder.dequeueOutputBuffer(bufferInfo, DEQUEUE_OUTPUT_BUFFER_TIMEOUT_US)
                 dequeueOutputBufferCount++
                 when (outIndex) {
                     MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
@@ -152,7 +143,7 @@ class VideoDecodeThread(
             }
 
             // Drain decoder
-            val inIndex: Int = decoder.dequeueInputBuffer(5000L)
+            val inIndex: Int = decoder.dequeueInputBuffer(DEQUEUE_INPUT_TIMEOUT_US)
             if (inIndex >= 0) {
                 decoder.queueInputBuffer(inIndex, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
             } else {
@@ -181,6 +172,9 @@ class VideoDecodeThread(
     companion object {
         private val TAG: String = VideoDecodeThread::class.java.simpleName
         private const val DEBUG = false
+
+        private val DEQUEUE_INPUT_TIMEOUT_US = TimeUnit.MILLISECONDS.toMicros(500)
+        private val DEQUEUE_OUTPUT_BUFFER_TIMEOUT_US = TimeUnit.MILLISECONDS.toMicros(100)
     }
 
 }

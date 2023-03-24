@@ -7,3 +7,5 @@
 .cxx
 local.properties
 /.idea
+settings.gradle
+.settings.gradle
