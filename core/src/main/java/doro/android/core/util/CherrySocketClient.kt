@@ -27,6 +27,7 @@ class CherrySocketClient(
             this["userId"] = listOf("${userHolder.getUserId()}")
         }
     }
+
     private val socket = IO.socket("http://15.165.196.152:7998", options)
 
 
@@ -81,7 +82,12 @@ class CherrySocketClient(
                                 Broadcast.holdSlotNetworking.emit(false)
                             }
                             SocketMessageType.GA.name -> {
-                                Broadcast.getAddressEvent.emit(Pair(streamingAddress, networkCameraAddress))
+                                Broadcast.getAddressEvent.emit(
+                                    GetAddressValue(
+                                        machineNumber = machineNumber,
+                                        cameraUrl = networkCameraAddress,
+                                        streamUrl = streamingAddress,
+                                    ))
                             }
                             SocketMessageType.ALL_BREAK_OUT.name -> {
                                 Broadcast.allBreakOutEvent.emit(Unit)
@@ -100,8 +106,9 @@ class CherrySocketClient(
     }
 
     private fun listen(): Flow<Array<out Any>> = callbackFlow {
-
+        Log.i("Socket", "LETS CONNECT")
         socket.connect()
+        socket.io().timeout(10000)
 
         socket.on(io.socket.client.Socket.EVENT_CONNECT) {
             // 소켓 서버에 연결이 성공하면 호출됩니다.
@@ -115,10 +122,13 @@ class CherrySocketClient(
             socket.connect()
             Log.i("Socket", "Connect Error: ${args[0]}")
         }.on("events") {
+            var command = ""
             it.forEach { value ->
-                Log.d(TAG, value.toString())
+                command += value.toString()
             }
+            Log.d("Socket", command)
             trySend(it)
+            //socket.emit("events", "Android Received $command")
         }
         awaitClose()
     }
@@ -129,7 +139,7 @@ object Broadcast {
     val notificationRefreshEvent = MutableSharedFlow<Unit>()
     val notifyCreditEvent = MutableSharedFlow<Int>()
     val releaseSlotEvent = MutableSharedFlow<Int>()
-    val getAddressEvent = MutableSharedFlow<Pair<String,String>>()
+    val getAddressEvent = MutableSharedFlow<GetAddressValue>()
     val creditInEvent = MutableSharedFlow<Int>()
     val creditOutEvent = MutableSharedFlow<Int>()
     val userRefreshEvent = MutableSharedFlow<Unit>()
@@ -146,10 +156,16 @@ enum class SocketMessageType {
 
 @Parcelize
 data class MachineStatusValue(
-    val status: String,
-    val timer: Int,
-    val machineNumber: String,
-    val credit: Int,
+    var status: String,
+    var timer: Int,
+    var machineNumber: String,
+    var credit: Int,
     var cameraUrl: String? = null,
     var streamUrl: String? = null,
 ): Parcelable
+
+data class GetAddressValue(
+    val machineNumber: String,
+    val cameraUrl: String,
+    val streamUrl: String,
+)
