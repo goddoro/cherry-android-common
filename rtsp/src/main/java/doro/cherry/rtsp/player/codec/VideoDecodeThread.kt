@@ -31,7 +31,7 @@ class VideoDecodeThread(
     var infoTryAgainLater = 0
     var outIndexNegative = 0
     var onFrameRenderTime = 0L
-    val decoder = MediaCodec.createByCodecName("c2.android.h263.decoder")
+    val decoder = MediaCodec.createDecoderByType(mimeType)
 
 
     fun stopAsync() {
