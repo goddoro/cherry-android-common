@@ -4,20 +4,19 @@ import android.os.Parcelable
 import android.util.Log
 import io.socket.client.IO
 import io.socket.client.Socket.EVENT_CONNECT_ERROR
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.parcelize.Parcelize
 import org.json.JSONObject
+import java.util.*
 
 @OptIn(DelicateCoroutinesApi::class)
 class CherrySocketClient(
-    val userHolder: UserHolder,
-    val onSocketConnected: () -> Unit,
-    val onSocketDisconnected: () -> Unit
+    val userHolder: UserHolder
 ) {
 
     private val TAG = CherrySocketClient::class.java.simpleName
@@ -25,15 +24,23 @@ class CherrySocketClient(
         transports = arrayOf("websocket")
         extraHeaders = hashMapOf<String, List<String>>().apply {
             this["userId"] = listOf("${userHolder.getUserId()}")
+            this["uuid"] = listOf(UUID.randomUUID().toString())
         }
     }
 
     private val socket = IO.socket("http://15.165.196.152:7998", options)
+    private var connected = false
+    private var pingCount = 0
+    private var pongCount = 0
 
 
     init {
         GlobalScope.launch(Dispatchers.Main) {
             listen().collect {
+                if (!connected){
+                    connected = true
+                    Broadcast.serverConnectionEvent.emit(true)
+                }
                 try {
                     val command = JSONObject(it[0].toString())
                     val success = command.optBoolean("success")
@@ -79,11 +86,11 @@ class CherrySocketClient(
                             SocketMessageType.OC.name -> {
                                 Broadcast.creditOutEvent.emit(credit)
                             }
-                            SocketMessageType.HS.name -> {
-                                Broadcast.holdSlotNetworking.emit(false)
-                            }
                             SocketMessageType.AS.name -> {
                                 Broadcast.autoModeEvent.emit(Integer.parseInt(autoMode))
+                            }
+                            SocketMessageType.HS.name -> {
+                                Broadcast.holdSlotNetworking.emit(false)
                             }
                             SocketMessageType.GA.name -> {
                                 Broadcast.getAddressEvent.emit(
@@ -91,7 +98,8 @@ class CherrySocketClient(
                                         machineNumber = machineNumber,
                                         cameraUrl = networkCameraAddress,
                                         streamUrl = streamingAddress,
-                                    ))
+                                    )
+                                )
                             }
                             SocketMessageType.ALL_BREAK_OUT.name -> {
                                 Broadcast.allBreakOutEvent.emit(Unit)
@@ -102,12 +110,13 @@ class CherrySocketClient(
                             }
                         }
                     }
-                } catch (e: Throwable){
+                } catch (e: Throwable) {
 
                 }
             }
         }
     }
+
 
     private fun listen(): Flow<Array<out Any>> = callbackFlow {
         Log.i("Socket", "LETS CONNECT")
@@ -116,27 +125,57 @@ class CherrySocketClient(
 
         socket.on(io.socket.client.Socket.EVENT_CONNECT) {
             // 소켓 서버에 연결이 성공하면 호출됩니다.
-            onSocketConnected()
             Log.i("Socket", "Connect")
         }.on(io.socket.client.Socket.EVENT_DISCONNECT) { args ->
             // 소켓 서버 연결이 끊어질 경우에 호출됩니다.
-            onSocketDisconnected()
+            connected = false
+            socket.close()
             Log.i("Socket", "Disconnet: ${args[0]}")
         }.on(EVENT_CONNECT_ERROR) { args ->
-            socket.connect()
+            socket.close()
             Log.i("Socket", "Connect Error: ${args[0]}")
         }.on("events") {
             var command = ""
             it.forEach { value ->
                 command += value.toString()
             }
-            Log.d("Socket", command)
+            Log.d("Socket", "Received $command")
             trySend(it)
-            //socket.emit("events", "Android Received $command")
+            if (command == "ping"){
+                pongCount++
+            }
         }
         awaitClose()
     }
 
+    fun sendMessage(message: String) {
+        Log.d(TAG, "Send ${message}")
+        socket.emit("events", message)
+    }
+
+    suspend fun pollingConnection(){
+        while(true){
+            delay(3000)
+            Log.d(TAG, "pingCount = $pingCount pongCount = $pongCount connected = $connected")
+            if ( pingCount != pongCount || !connected){
+                if (connected){
+                    Broadcast.serverConnectionEvent.emit(false)
+                }
+                destroyAndRetry()
+            } else {
+                sendMessage("ping")
+                pingCount++
+            }
+        }
+    }
+
+    private fun destroyAndRetry(){
+        socket.close()
+        socket.connect()
+        pingCount = -1
+        pongCount = -1
+        connected = false
+    }
 }
 
 object Broadcast {
@@ -152,6 +191,7 @@ object Broadcast {
     val allBreakOutEvent = MutableSharedFlow<Unit>()
     val machineResponseFail = MutableSharedFlow<Unit>()
     val forceLogOut = MutableSharedFlow<Unit>()
+    val serverConnectionEvent = MutableSharedFlow<Boolean>()
     val autoModeEvent = MutableSharedFlow<Int>()
 }
 
@@ -167,7 +207,7 @@ data class MachineStatusValue(
     var credit: Int,
     var cameraUrl: String? = null,
     var streamUrl: String? = null,
-): Parcelable
+) : Parcelable
 
 data class GetAddressValue(
     val machineNumber: String,
