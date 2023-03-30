@@ -15,5 +15,7 @@ interface MachineRepository {
     suspend fun customService(machineNumber: String, customServiceCode: Int)
     suspend fun searchOccupied(): String?
     suspend fun findOne(number: String): Machine
+    suspend fun setAutoMode(machineNumber: String, autoMode: Int)
+    suspend fun getAutoMode(machineNumber: String)
 }
 

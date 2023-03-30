@@ -125,6 +125,27 @@ class MachineRepositoryImpl @Inject constructor(
             )
             machineService.command(request)
         }
+
+    override suspend fun getAutoMode(machineNumber: String) {
+        withContext(Dispatchers.IO){
+            val request = MachineCommandRequest(
+                endPoint = "AS",
+                machineNumber = machineNumber,
+            )
+            machineService.command(request)
+        }
+    }
+
+    override suspend fun setAutoMode(machineNumber: String, autoMode: Int) {
+        withContext(Dispatchers.IO){
+            val request = MachineCommandRequest(
+                endPoint = "AM",
+                machineNumber = machineNumber,
+                autoMode = autoMode,
+            )
+            machineService.command(request)
+        }
+    }
 }
 
 

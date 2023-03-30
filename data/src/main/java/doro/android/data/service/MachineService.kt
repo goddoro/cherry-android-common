@@ -40,4 +40,7 @@ data class MachineCommandRequest(
 
     @SerializedName("customServiceCode")
     val customServiceCode: Int? = null,
+
+    @SerializedName("autoMode")
+    val autoMode: Int? = null,
 ): Parcelable
