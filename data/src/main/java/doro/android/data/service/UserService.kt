@@ -1,5 +1,6 @@
 package doro.android.data.service
 
+import doro.android.data.dto.EmptyResponse
 import doro.android.data.dto.UserListResponse
 import doro.android.data.dto.UserResponse
 import doro.android.data.dto.UserSearchResponse
@@ -21,5 +22,8 @@ interface UserService {
 
     @GET("/users")
     suspend fun fetchAll(): UserListResponse
+
+    @DELETE("/users/{id}")
+    suspend fun signOut(): EmptyResponse
 
 }

@@ -31,4 +31,10 @@ class UserRepositoryImpl @Inject constructor(
         userService.fetchAll().users.map { it.toDomain() }
     }
 
+    override suspend fun signOut(): Boolean = withContext(Dispatchers.IO){
+        userService.signOut().success
+    }
+
+
+
 }
