@@ -13,7 +13,7 @@ interface MachineRepository {
     suspend fun selectEvent(machineNumber: String, eventNumber: Int)
     suspend fun getAddress(machineNumber: String)
     suspend fun customService(machineNumber: String, customServiceCode: Int)
-    suspend fun searchOccupied(): String?
+    suspend fun searchOccupied(): Machine?
     suspend fun findOne(number: String): Machine
     suspend fun setAutoMode(machineNumber: String, autoMode: Int)
     suspend fun getAutoMode(machineNumber: String)

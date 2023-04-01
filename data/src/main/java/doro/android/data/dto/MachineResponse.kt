@@ -22,6 +22,9 @@ data class MachineResponse(
 
     @SerializedName("occupiedUserId")
     val occupiedUserId: Int?,
+
+    @SerializedName("credit")
+    val credit: Int?,
 ) : Parcelable {
     fun toDomain() = Machine(
         id = id,
@@ -29,5 +32,6 @@ data class MachineResponse(
         number = number,
         game = game?.toDomain(),
         occupiedUserId = occupiedUserId,
+        credit = credit,
     )
 }

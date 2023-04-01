@@ -16,7 +16,8 @@ import java.util.*
 
 @OptIn(DelicateCoroutinesApi::class)
 class CherrySocketClient(
-    val userHolder: UserHolder
+    val userHolder: UserHolder,
+    val id: String,
 ) {
 
     private val TAG = CherrySocketClient::class.java.simpleName
@@ -24,7 +25,7 @@ class CherrySocketClient(
         transports = arrayOf("websocket")
         extraHeaders = hashMapOf<String, List<String>>().apply {
             this["userId"] = listOf("${userHolder.getUserId()}")
-            this["uuid"] = listOf(UUID.randomUUID().toString())
+            this["uuid"] = listOf(id)
         }
     }
 
@@ -106,6 +107,7 @@ class CherrySocketClient(
                             }
 
                             SocketMessageType.FORCE_LOG_OUT.name -> {
+                                socket.close()
                                 Broadcast.forceLogOut.emit(Unit)
                             }
                         }

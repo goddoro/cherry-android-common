@@ -17,7 +17,7 @@ interface MachineService {
     suspend fun command(@Body request: MachineCommandRequest)
 
     @GET("/machines/search/occupied")
-    suspend fun searchOccupied(): MachineResponse
+    suspend fun searchOccupied(): MachineResponse?
 
 }
 
