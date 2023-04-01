@@ -53,6 +53,7 @@ class CherrySocketClient(
                     val status = command.optString("status")
                     val timer = command.optInt("timer")
                     val autoMode = command.optString("autoMode")
+                    val announcement = command.optString("announcement")
 
 //                    Log.d(TAG, "type = $type")
 //                    Log.d("Socket", "networkCameraAddress = $networkCameraAddress")
@@ -74,6 +75,9 @@ class CherrySocketClient(
                                         credit = credit,
                                     )
                                 )
+                            }
+                            SocketMessageType.AN.name -> {
+                                Broadcast.announcementEvent.emit(announcement)
                             }
                             SocketMessageType.NC.name -> {
                                 Broadcast.notifyCreditEvent.emit(credit)
@@ -195,10 +199,11 @@ object Broadcast {
     val forceLogOut = MutableSharedFlow<Unit>()
     val serverConnectionEvent = MutableSharedFlow<Boolean>()
     val autoModeEvent = MutableSharedFlow<Int>()
+    val announcementEvent = MutableSharedFlow<String>()
 }
 
 enum class SocketMessageType {
-    IC, OC, HS, RS, SS, NC, GA, AS, ALL_BREAK_OUT, FORCE_LOG_OUT
+    IC, OC, HS, RS, SS, NC, GA, AS, AN, ALL_BREAK_OUT, FORCE_LOG_OUT
 }
 
 @Parcelize
