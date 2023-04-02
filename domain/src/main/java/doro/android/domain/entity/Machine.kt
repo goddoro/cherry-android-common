@@ -6,9 +6,10 @@ data class Machine(
     val number: String,
     val game: Game? = null,
     val occupiedUserId: Int?,
+    val credit: Int? = null,
 )
 
 enum class MachineStatus {
-    BROKEN, READY, HOLDING, PLAYING, PENDING, EVENT, SPECIAL_GAME_AUTO;
+    BROKEN, READY, HOLDING, PLAYING, PENDING, EVENT, SPECIAL_GAME_AUTO, WAIT_TO_HOLDING;
     fun isAvailable() = this == READY
 }
