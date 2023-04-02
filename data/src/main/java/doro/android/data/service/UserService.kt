@@ -23,7 +23,7 @@ interface UserService {
     @GET("/users")
     suspend fun fetchAll(): UserListResponse
 
-    @DELETE("/users/{id}")
+    @DELETE("/users")
     suspend fun signOut(): EmptyResponse
 
 }
