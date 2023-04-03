@@ -69,6 +69,7 @@ class VideoDecodeThread(
                     decoder.codecInfo.getCapabilitiesForType(mimeType).maxSupportedInstances
                 }"
             )
+            decoder.setOnFrameRenderedListener(onFrameRenderedListener, null)
             decoder.configure(format, surface, null, 0)
 
             // TODO: add scale option (ie: FIT, SCALE_CROP, SCALE_NO_CROP)
