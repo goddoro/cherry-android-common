@@ -159,14 +159,12 @@ class CherrySocketClient(
     }
 
     fun sendMessage(message: String) {
-        Log.d(TAG, "Send ${message}")
         socket.emit("events", message)
     }
 
     suspend fun pollingConnection(){
         while(true){
             delay(3000)
-            Log.d(TAG, "pingCount = $pingCount pongCount = $pongCount connected = $connected")
             if ( pingCount != pongCount || !connected){
                 if (connected){
                     Broadcast.serverConnectionEvent.emit(false)
