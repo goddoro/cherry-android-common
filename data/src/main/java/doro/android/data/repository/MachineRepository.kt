@@ -26,6 +26,9 @@ class MachineRepositoryImpl @Inject constructor(
 
     override suspend fun creditIn(machineNumber: String, credit: Int) =
         withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                soundEffectPlayer.play()
+            }
             logRepository.sendGameButtonEvent(
                 name = CherryGameButtonName.credit_in.name,
                 credit = credit,
@@ -40,6 +43,9 @@ class MachineRepositoryImpl @Inject constructor(
 
     override suspend fun creditOut(machineNumber: String, credit: Int) =
         withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                soundEffectPlayer.play()
+            }
             logRepository.sendGameButtonEvent(
                 name = CherryGameButtonName.credit_in.name,
                 credit = credit,
@@ -78,6 +84,9 @@ class MachineRepositoryImpl @Inject constructor(
 
     override suspend fun selectEvent(machineNumber: String, eventNumber: Int) {
         withContext(Dispatchers.IO){
+            withContext(Dispatchers.Main) {
+                soundEffectPlayer.play()
+            }
             val request = MachineCommandRequest(
                 endPoint = "SE",
                 machineNumber = machineNumber,
@@ -89,6 +98,9 @@ class MachineRepositoryImpl @Inject constructor(
 
     override suspend fun customService(machineNumber: String, customServiceCode: Int) {
         withContext(Dispatchers.IO){
+            withContext(Dispatchers.Main) {
+                soundEffectPlayer.play()
+            }
             val request = MachineCommandRequest(
                 endPoint = "CS",
                 machineNumber = machineNumber,
@@ -105,6 +117,9 @@ class MachineRepositoryImpl @Inject constructor(
 
     override suspend fun releaseSlot(machineNumber: String) =
         withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                soundEffectPlayer.play()
+            }
             val request = MachineCommandRequest(
                 endPoint = "RS",
                 machineNumber = machineNumber,
