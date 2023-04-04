@@ -138,6 +138,9 @@ class MachineRepositoryImpl @Inject constructor(
 
     override suspend fun setAutoMode(machineNumber: String, autoMode: Int) {
         withContext(Dispatchers.IO){
+            withContext(Dispatchers.Main) {
+                soundEffectPlayer.play()
+            }
             val request = MachineCommandRequest(
                 endPoint = "AM",
                 machineNumber = machineNumber,
