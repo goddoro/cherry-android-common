@@ -6,4 +6,5 @@ data class User(
     val username: String,
     val point: Int,
     val token: String,
+    val agent: Agent?,
 )

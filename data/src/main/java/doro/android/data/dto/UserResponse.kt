@@ -18,6 +18,9 @@ data class UserResponse(
 
     @SerializedName("point")
     val point: Int,
+
+    @SerializedName("agent")
+    val agent: AgentResponse?,
 ) : Parcelable {
 
     fun toDomain(token: String? = null): User {
@@ -27,6 +30,7 @@ data class UserResponse(
             username = username,
             point = point,
             token = token.orEmpty(),
+            agent = agent?.toDomain(),
         )
     }
 }
