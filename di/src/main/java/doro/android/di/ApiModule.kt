@@ -83,4 +83,9 @@ class ApiModule {
     fun providePointRequestService(retrofit: Retrofit): UserPointRequestService =
         retrofit.create(UserPointRequestService::class.java)
 
+    @Singleton
+    @Provides
+    fun provideAppService(retrofit: Retrofit): AppService =
+        retrofit.create(AppService::class.java)
+
 }

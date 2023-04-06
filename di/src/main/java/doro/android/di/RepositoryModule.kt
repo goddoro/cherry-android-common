@@ -83,4 +83,9 @@ abstract class RepositoryModule {
     abstract fun bindUserPointRequestRepository(
         userPointRequestRepositoryImpl: UserPointRequestRepositoryImpl
     ): UserPointRequestRepository
+
+    @Binds
+    abstract fun bindAppRepository(
+        appRepositoryImpl: AppRepositoryImpl
+    ): AppRepository
 }
