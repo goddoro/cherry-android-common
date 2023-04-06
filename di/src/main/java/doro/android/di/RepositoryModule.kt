@@ -88,4 +88,9 @@ abstract class RepositoryModule {
     abstract fun bindAppRepository(
         appRepositoryImpl: AppRepositoryImpl
     ): AppRepository
+
+    @Binds
+    abstract fun bindFaqRepository(
+        faqRepositoryImpl: FaqRepositoryImpl
+    ): FaqRepository
 }

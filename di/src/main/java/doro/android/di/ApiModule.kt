@@ -88,4 +88,9 @@ class ApiModule {
     fun provideAppService(retrofit: Retrofit): AppService =
         retrofit.create(AppService::class.java)
 
+    @Singleton
+    @Provides
+    fun provideFaqService(retrofit: Retrofit): FaqService =
+        retrofit.create(FaqService::class.java)
+
 }
