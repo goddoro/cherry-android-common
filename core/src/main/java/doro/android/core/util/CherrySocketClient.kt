@@ -64,7 +64,7 @@ class CherrySocketClient(
 //                    Log.d("Socket", "status = $status")
 
                     if (!success) {
-                        Broadcast.machineResponseFail.emit(Unit)
+                        Broadcast.machineResponseFail.emit(type)
                     } else {
                         when (type) {
                             SocketMessageType.SS.name -> {
@@ -197,7 +197,7 @@ object Broadcast {
     val holdSlotNetworking = MutableStateFlow(false)
     val machineStatusChange = MutableSharedFlow<MachineStatusValue>()
     val allBreakOutEvent = MutableSharedFlow<Unit>()
-    val machineResponseFail = MutableSharedFlow<Unit>()
+    val machineResponseFail = MutableSharedFlow<String>()
     val forceLogOut = MutableSharedFlow<Unit>()
     val serverConnectionEvent = MutableSharedFlow<Boolean>()
     val autoModeEvent = MutableSharedFlow<Int>()
