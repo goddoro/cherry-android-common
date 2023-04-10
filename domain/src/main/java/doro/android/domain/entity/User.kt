@@ -7,4 +7,10 @@ data class User(
     val point: Int,
     val token: String,
     val agent: Agent?,
+    val role: UserRole,
 )
+
+
+enum class UserRole {
+    player, admin
+}
