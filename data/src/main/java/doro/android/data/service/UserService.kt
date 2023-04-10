@@ -1,9 +1,6 @@
 package doro.android.data.service
 
-import doro.android.data.dto.EmptyResponse
-import doro.android.data.dto.UserListResponse
-import doro.android.data.dto.UserResponse
-import doro.android.data.dto.UserSearchResponse
+import doro.android.data.dto.*
 import retrofit2.http.*
 
 interface UserService {
@@ -18,6 +15,12 @@ interface UserService {
     suspend fun update(
         @Path("id") userId: Int,
         @FieldMap params: HashMap<String, Any>
+    ): UserResponse
+
+    @PATCH("/users/{id}/point")
+    suspend fun updatePoint(
+        @Path("id") userId: Int,
+        @Body body: UserPointUpdateRequest
     ): UserResponse
 
     @GET("/users")

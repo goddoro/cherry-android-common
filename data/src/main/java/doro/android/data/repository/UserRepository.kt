@@ -1,6 +1,7 @@
 package doro.android.data.repository
 
 import doro.android.core.util.filterValueNotNull
+import doro.android.data.dto.UserPointUpdateRequest
 import doro.android.data.service.UserService
 import doro.android.domain.entity.User
 import doro.android.domain.repository.UserRepository
@@ -35,6 +36,8 @@ class UserRepositoryImpl @Inject constructor(
         userService.signOut().success
     }
 
-
+    override suspend fun updatePoint(userId: Int, point: Int): User = withContext(Dispatchers.IO) {
+        userService.updatePoint(userId, UserPointUpdateRequest(point)).toDomain()
+    }
 
 }

@@ -8,4 +8,5 @@ interface UserRepository {
     suspend fun search(query: String): User?
     suspend fun update(userId: Int, password: String): User
     suspend fun signOut(): Boolean
+    suspend fun updatePoint(userId: Int, point: Int): User
 }
