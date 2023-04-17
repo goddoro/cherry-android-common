@@ -118,6 +118,9 @@ class CherrySocketClient(
                                 socket.close()
                                 Broadcast.forceLogOut.emit(Unit)
                             }
+                            SocketMessageType.GRM_CONNECTION_SUCCESS.name -> {
+                                Broadcast.grmConnectionSuccessEvent.emit(Unit)
+                            }
                         }
                     }
                 } catch (e: Throwable) {
@@ -203,10 +206,11 @@ object Broadcast {
     val autoModeEvent = MutableSharedFlow<Int>()
     val announcementEvent = MutableSharedFlow<String>()
     val buttonStateEvent = MutableSharedFlow<String>()
+    val grmConnectionSuccessEvent = MutableSharedFlow<Unit>()
 }
 
 enum class SocketMessageType {
-    IC, OC, HS, RS, SS, NC, GA, AS, AN, BL, ALL_BREAK_OUT, FORCE_LOG_OUT
+    IC, OC, HS, RS, SS, NC, GA, AS, AN, BL, ALL_BREAK_OUT, FORCE_LOG_OUT, GRM_CONNECTION_SUCCESS
 }
 
 @Parcelize
