@@ -2,7 +2,7 @@ package doro.android.domain.entity
 
 data class UsageHistory(
     val id: Int,
-    val machine: Machine,
+    val machineNumber: String,
     val createdAt: String,
     val endTime: String?,
     val before: Int,

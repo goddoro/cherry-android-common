@@ -11,8 +11,8 @@ data class UsageHistoryResponse(
     val id: Int,
     @SerializedName("startTime")
     val startTime: String,
-    @SerializedName("machine")
-    val machine: MachineResponse,
+    @SerializedName("machineNumber")
+    val machineNumber: MachineResponse,
     @SerializedName("endTime")
     val endTime: String?,
     @SerializedName("before")
@@ -24,7 +24,7 @@ data class UsageHistoryResponse(
     fun toDomain(): UsageHistory {
         return UsageHistory(
             id = id,
-            machine = machine.toDomain(),
+            machineNumber = machineNumber,
             createdAt = startTime,
             endTime = endTime,
             before = before,
