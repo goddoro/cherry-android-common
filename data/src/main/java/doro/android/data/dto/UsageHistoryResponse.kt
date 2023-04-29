@@ -19,6 +19,8 @@ data class UsageHistoryResponse(
     val before: Int,
     @SerializedName("after")
     val after: Int,
+    @SerializedName("game")
+    val game: GameResponse,
 
 ) : Parcelable {
     fun toDomain(): UsageHistory {
@@ -29,6 +31,7 @@ data class UsageHistoryResponse(
             endTime = endTime,
             before = before,
             after = after,
+            game = game.toDomain(),
         )
     }
 }

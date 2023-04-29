@@ -6,5 +6,6 @@ data class UsageHistory(
     val createdAt: String,
     val endTime: String?,
     val before: Int,
-    val after: Int
+    val after: Int,
+    val game: Game,
 )
