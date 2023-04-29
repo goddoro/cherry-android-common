@@ -1,12 +1,12 @@
 package doro.android.di
 
-
 import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import doro.android.core.util.EndPoint
 import doro.android.core.util.NetworkUtil
 import doro.android.core.util.UserHolder
 import okhttp3.Interceptor
@@ -18,21 +18,19 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+
 const val LOG_NAMED = "LOG_NAMED"
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val baseUrl = "http://15.165.196.152:3000/"
-
     @Singleton
     @Provides
     fun provideOkHttpClient(
         userHolder: UserHolder,
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): OkHttpClient {
-
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         return OkHttpClient.Builder()
@@ -45,9 +43,8 @@ object NetworkModule {
     @Named("LOG_OK_HTTP_CLIENT")
     fun provideLogOkHttpClient(
         userHolder: UserHolder,
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): OkHttpClient {
-
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         return OkHttpClient.Builder()
@@ -57,10 +54,10 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideCherryRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideCherryRetrofit(okHttpClient: OkHttpClient, userHolder: UserHolder): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl("http://15.165.196.152:3000/")
+            .baseUrl(userHolder.getCurrentServerEndPoint())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -71,12 +68,10 @@ object NetworkModule {
     fun provideLogRetrofit(@Named("LOG_OK_HTTP_CLIENT") okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl("http://13.124.181.184:3000/")
+            .baseUrl(EndPoint.LOG_SERVER_URL.url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
-
-
 }
 
 class CherryInterceptor @Inject constructor(
@@ -90,7 +85,7 @@ class CherryInterceptor @Inject constructor(
             .header("x-cherry-client", "android_" + userHolder.getUserType())
             .header(
                 "x-cherry-version",
-                context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName,
             )
             .build()
         return chain.proceed(request)
@@ -107,7 +102,7 @@ class LogInterceptor @Inject constructor(
             .header("x-cherry-log-device-name", android.os.Build.MODEL)
             .header(
                 "x-cherry-log-version",
-                context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName,
             )
             .header("x-cherry-log-env", "debug")
             .header("x-cherry-log-ip", NetworkUtil.getIpAddress())

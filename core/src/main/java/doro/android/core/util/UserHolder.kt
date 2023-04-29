@@ -6,12 +6,21 @@ class UserHolder @Inject constructor(
     private val prefUtil: PrefUtil
 ) {
     fun setUser(userId: Int, token: String?) {
-        prefUtil.setString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_ID, userId.toString())
+        prefUtil.setString(
+            PrefKeys.Session.FILE_NAME,
+            PrefKeys.Session.KEY_USER_ID,
+            userId.toString()
+        )
         prefUtil.setString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_TOKEN, token)
     }
 
     fun getUserId(): Int {
-        return Integer.parseInt(prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_ID) ?: "-1")
+        return Integer.parseInt(
+            prefUtil.getString(
+                PrefKeys.Session.FILE_NAME,
+                PrefKeys.Session.KEY_USER_ID
+            ) ?: "-1"
+        )
     }
 
     fun getToken(): String? {
@@ -22,27 +31,55 @@ class UserHolder @Inject constructor(
         return getUserId() != -1
     }
 
-    fun clearUser(){
+    fun clearUser() {
         prefUtil.remove(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_ID)
     }
 
     fun getUserType(): String {
-        return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_TYPE).orEmpty()
+        return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_TYPE)
+            .orEmpty()
     }
 
-    fun setUserType(userType: UserType){
-        prefUtil.setString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_TYPE, userType.name)
+    fun setUserType(userType: UserType) {
+        prefUtil.setString(
+            PrefKeys.Session.FILE_NAME,
+            PrefKeys.Session.KEY_USER_TYPE,
+            userType.name
+        )
     }
 
     fun getEmail(): String? {
         return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_EMAIL)
     }
 
-    fun setUserEmail(email: String){
+    fun setUserEmail(email: String) {
         prefUtil.setString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_EMAIL, email)
+    }
+
+    fun getCurrentServerEndPoint(): String {
+        return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_SERVER_END_POINT)
+            ?: EndPoint.ASV_DEVELOPER_URL.url
+    }
+
+    fun getCurrentServerType(): String {
+        return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_SERVER_TYPE)
+            ?: EndPoint.ASV_DEVELOPER_URL.type
+    }
+
+    fun setCurrentServerEndPoint(endPoint: EndPoint) {
+        prefUtil.setString(
+            PrefKeys.Session.FILE_NAME,
+            PrefKeys.Session.KEY_SERVER_END_POINT,
+            endPoint.url
+        )
+        prefUtil.setString(
+            PrefKeys.Session.FILE_NAME,
+            PrefKeys.Session.KEY_SERVER_TYPE,
+            endPoint.type
+        )
     }
 }
 
-enum class UserType{
+enum class UserType {
     player, agent, cashier
 }

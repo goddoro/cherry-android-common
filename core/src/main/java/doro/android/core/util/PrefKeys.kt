@@ -9,5 +9,7 @@ object PrefKeys {
         const val KEY_USER_TYPE = "user_type"
         const val KEY_USER_EMAIL = "user_email"
         const val KEY_UUID = "uuid"
+        const val KEY_SERVER_END_POINT = "key_server_end_point"
+        const val KEY_SERVER_TYPE = "key_server_type"
     }
 }
