@@ -12,7 +12,7 @@ data class UsageHistoryResponse(
     @SerializedName("startTime")
     val startTime: String,
     @SerializedName("machineNumber")
-    val machineNumber: MachineResponse,
+    val machineNumber: String,
     @SerializedName("endTime")
     val endTime: String?,
     @SerializedName("before")
