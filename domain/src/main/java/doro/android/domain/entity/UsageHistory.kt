@@ -8,4 +8,5 @@ data class UsageHistory(
     val before: Int,
     val after: Int,
     val game: Game,
+    val moneyHistory: MoneyHistory?,
 )
