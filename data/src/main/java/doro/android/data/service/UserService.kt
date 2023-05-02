@@ -29,4 +29,7 @@ interface UserService {
     @DELETE("/users")
     suspend fun signOut(): EmptyResponse
 
+    @PATCH("/users/{id}/agent")
+    suspend fun updateAgent(@Path("id") userId: Int, @Body updateAgentRequest: UpdateAgentRequest): UserResponse
+
 }

@@ -9,4 +9,6 @@ interface UserRepository {
     suspend fun update(userId: Int, password: String): User
     suspend fun signOut(): Boolean
     suspend fun updatePoint(userId: Int, point: Int): User
+
+    suspend fun updateAgent(userId: Int, agentId: Int): User
 }
