@@ -34,7 +34,7 @@ data class UsageHistoryResponse(
             before = before,
             after = after,
             game = game.toDomain(),
-            moneyHistories = moneyHistories?.moneyHistories?.map { it.toDomain() },
+            moneyHistories = moneyHistories?.map { it.toDomain() },
         )
     }
 }
