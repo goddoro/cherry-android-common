@@ -21,7 +21,7 @@ data class UsageHistoryResponse(
     val after: Int,
     @SerializedName("game")
     val game: GameResponse,
-    @SerializedName("moneyHistory")
+    @SerializedName("moneyHistories")
     val moneyHistories: MoneyHistoryListResponse?,
 
 ) : Parcelable {
