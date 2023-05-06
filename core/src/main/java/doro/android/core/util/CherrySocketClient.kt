@@ -55,6 +55,7 @@ class CherrySocketClient(
                     val autoMode = command.optString("autoMode")
                     val announcement = command.optString("announcement")
                     val buttonEnabled = command.optString("buttonFlag")
+                    val jackPot = command.opt("jackpots") as List<Int>
 
 //                    Log.d(TAG, "type = $type")
 //                    Log.d("Socket", "networkCameraAddress = $networkCameraAddress")
@@ -67,6 +68,9 @@ class CherrySocketClient(
                         Broadcast.machineResponseFail.emit(type)
                     } else {
                         when (type) {
+                            SocketMessageType.NJ.name -> {
+                                Broadcast.notifyJackpotEvent.emit(jackPot)
+                            }
                             SocketMessageType.SS.name -> {
                                 Broadcast.machineStatusChange.emit(
                                     MachineStatusValue(
@@ -207,10 +211,11 @@ object Broadcast {
     val announcementEvent = MutableSharedFlow<String>()
     val buttonStateEvent = MutableSharedFlow<String>()
     val grmConnectionSuccessEvent = MutableSharedFlow<Unit>()
+    val notifyJackpotEvent = MutableSharedFlow<List<Int>>()
 }
 
 enum class SocketMessageType {
-    IC, OC, HS, RS, SS, NC, GA, AS, AN, BL, ALL_BREAK_OUT, FORCE_LOG_OUT, GRM_CONNECTION_SUCCESS
+    IC, OC, HS, RS, SS, NC, GA, AS, AN, BL, NJ, ALL_BREAK_OUT, FORCE_LOG_OUT, GRM_CONNECTION_SUCCESS
 }
 
 @Parcelize

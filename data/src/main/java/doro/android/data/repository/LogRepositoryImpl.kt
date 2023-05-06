@@ -19,16 +19,16 @@ class LogRepositoryImpl @Inject constructor(
     private val TAG = LogRepository::class.java.simpleName
     override suspend fun sendClickEvent(where: CherryUI, name: CherryButtonEvent): Unit =
         withContext(Dispatchers.IO) {
-            try {
-                val request = LogEventRequest(
-                    action = CherryAction.clicked,
-                    where = where,
-                    data = ButtonClickData(name = name),
-                )
-                logService.sendEvent(CherryLogEventRequest(request))
-            } catch (e: Throwable){
-                Log.d(TAG, e.message.orEmpty())
-            }
+//            try {
+//                val request = LogEventRequest(
+//                    action = CherryAction.clicked,
+//                    where = where,
+//                    data = ButtonClickData(name = name),
+//                )
+//                logService.sendEvent(CherryLogEventRequest(request))
+//            } catch (e: Throwable){
+//                Log.d(TAG, e.message.orEmpty())
+//            }
         }
 
     override suspend fun sendPingEvent(
@@ -37,44 +37,44 @@ class LogRepositoryImpl @Inject constructor(
         point: Int,
         gameName: String,
     ): Unit = withContext(Dispatchers.IO) {
-        try {
-            val request = LogEventRequest(
-                action = CherryAction.ping,
-                where = CherryUI.game,
-                data = GamePingData(
-                    machineNumber = machineNumber,
-                    credit = credit,
-                    point = point,
-                    gameName = gameName,
-                ),
-            )
-            logService.sendEvent(CherryLogEventRequest(request))
-        } catch (e: Throwable){
-            Log.d(TAG, e.message.orEmpty())
-        }
+//        try {
+//            val request = LogEventRequest(
+//                action = CherryAction.ping,
+//                where = CherryUI.game,
+//                data = GamePingData(
+//                    machineNumber = machineNumber,
+//                    credit = credit,
+//                    point = point,
+//                    gameName = gameName,
+//                ),
+//            )
+//            logService.sendEvent(CherryLogEventRequest(request))
+//        } catch (e: Throwable){
+//            Log.d(TAG, e.message.orEmpty())
+//        }
     }
 
     override suspend fun sendVisitEvent(where: CherryUI): Unit = withContext(Dispatchers.IO) {
-        try {
-            val request = LogEventRequest(
-                action = CherryAction.visited,
-                where = where,
-            )
-            logService.sendEvent(CherryLogEventRequest(request))
-        } catch (e: Throwable){
-            Log.d(TAG, e.message.orEmpty())
-        }
+//        try {
+//            val request = LogEventRequest(
+//                action = CherryAction.visited,
+//                where = where,
+//            )
+//            logService.sendEvent(CherryLogEventRequest(request))
+//        } catch (e: Throwable){
+//            Log.d(TAG, e.message.orEmpty())
+//        }
     }
 
     override suspend fun sendStreamingBugEvent(message: String): Unit = withContext(Dispatchers.IO) {
-        try {
-            val request = CherryStreamingLogEvent(
-                message = message,
-            )
-            logService.sendStreamingEvent(CherryStreamingLogEventRequest(request))
-        } catch (e: Throwable) {
-            Log.d(TAG, e.message.orEmpty())
-        }
+//        try {
+//            val request = CherryStreamingLogEvent(
+//                message = message,
+//            )
+//            logService.sendStreamingEvent(CherryStreamingLogEventRequest(request))
+//        } catch (e: Throwable) {
+//            Log.d(TAG, e.message.orEmpty())
+//        }
     }
 
     override suspend fun sendGameButtonEvent(
@@ -83,20 +83,20 @@ class LogRepositoryImpl @Inject constructor(
         cameraMode: String?,
         machineNumber: String?,
     ): Unit = withContext(Dispatchers.IO) {
-        try {
-            val request = LogEventRequest(
-                action = CherryAction.clicked,
-                where = if (name == CherryGameButtonName.available_machine_button.name) CherryUI.home else CherryUI.game,
-                data = GameButtonClickData(
-                    name = name,
-                    credit = credit,
-                    cameraMode = cameraMode,
-                    machineNumber = machineNumber,
-                )
-            )
-            logService.sendEvent(CherryLogEventRequest(request))
-        } catch (e: Throwable) {
-            Log.d(TAG, e.message.orEmpty())
-        }
+//        try {
+//            val request = LogEventRequest(
+//                action = CherryAction.clicked,
+//                where = if (name == CherryGameButtonName.available_machine_button.name) CherryUI.home else CherryUI.game,
+//                data = GameButtonClickData(
+//                    name = name,
+//                    credit = credit,
+//                    cameraMode = cameraMode,
+//                    machineNumber = machineNumber,
+//                )
+//            )
+//            logService.sendEvent(CherryLogEventRequest(request))
+//        } catch (e: Throwable) {
+//            Log.d(TAG, e.message.orEmpty())
+//        }
     }
 }
