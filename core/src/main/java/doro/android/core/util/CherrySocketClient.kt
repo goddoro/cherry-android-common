@@ -55,7 +55,7 @@ class CherrySocketClient(
                     val autoMode = command.optString("autoMode")
                     val announcement = command.optString("announcement")
                     val buttonEnabled = command.optString("buttonFlag")
-                    val jackPot = command.opt("jackpots") as List<Int>
+
 
 //                    Log.d(TAG, "type = $type")
 //                    Log.d("Socket", "networkCameraAddress = $networkCameraAddress")
@@ -69,6 +69,7 @@ class CherrySocketClient(
                     } else {
                         when (type) {
                             SocketMessageType.NJ.name -> {
+                                val jackPot = command.opt("jackpots") as List<Int>
                                 Broadcast.notifyJackpotEvent.emit(jackPot)
                             }
                             SocketMessageType.SS.name -> {
