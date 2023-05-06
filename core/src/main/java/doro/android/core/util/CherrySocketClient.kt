@@ -234,3 +234,10 @@ data class GetAddressValue(
     val cameraUrl: String,
     val streamUrl: String,
 )
+
+data class JackPotValue(
+    val grand: Int,
+    val major: Int,
+    val minor: Int,
+    val mini: Int,
+)
