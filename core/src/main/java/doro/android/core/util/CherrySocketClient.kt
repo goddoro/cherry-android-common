@@ -69,8 +69,12 @@ class CherrySocketClient(
                     } else {
                         when (type) {
                             SocketMessageType.NJ.name -> {
-                                val jackPot = command.opt("jackpots") as List<Int>
-                                Broadcast.notifyJackpotEvent.emit(jackPot)
+                                Log.d("Socket", "Hello NJ!")
+                                val jackPot = command.optJSONArray("jackpots")?.toIntList() ?: listOf()
+                                Log.d("Socket", jackPot.toString())
+                                if (jackPot.size == 4) {
+                                    Broadcast.notifyJackpotEvent.emit(jackPot)
+                                }
                             }
                             SocketMessageType.SS.name -> {
                                 Broadcast.machineStatusChange.emit(
@@ -129,7 +133,7 @@ class CherrySocketClient(
                         }
                     }
                 } catch (e: Throwable) {
-
+                    Log.d("Socket", e.message.orEmpty())
                 }
             }
         }
