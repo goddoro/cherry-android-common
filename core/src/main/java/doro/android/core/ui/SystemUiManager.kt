@@ -1,6 +1,7 @@
 package doro.android.core.ui
 
 import android.app.Activity
+import android.view.WindowManager
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -8,6 +9,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 interface SystemUiManager {
     fun show()
     fun hide()
+    fun keepOnScreen()
 }
 
 class ActivitySystemUiManager(
@@ -32,5 +34,9 @@ class ActivitySystemUiManager(
     override fun hide() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+    }
+
+    override fun keepOnScreen() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 }
