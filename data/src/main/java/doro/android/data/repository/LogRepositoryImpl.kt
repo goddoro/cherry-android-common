@@ -66,15 +66,16 @@ class LogRepositoryImpl @Inject constructor(
 //        }
     }
 
-    override suspend fun sendStreamingBugEvent(message: String): Unit = withContext(Dispatchers.IO) {
-//        try {
-//            val request = CherryStreamingLogEvent(
-//                message = message,
-//            )
-//            logService.sendStreamingEvent(CherryStreamingLogEventRequest(request))
-//        } catch (e: Throwable) {
-//            Log.d(TAG, e.message.orEmpty())
-//        }
+    override suspend fun sendBugEvent(message: String, type: String): Unit = withContext(Dispatchers.IO) {
+        try {
+            val request = CherryAndroidBugEvent(
+                message = message,
+                type = type,
+            )
+            logService.sendStreamingEvent(request)
+        } catch (e: Throwable) {
+            Log.d(TAG, e.message.orEmpty())
+        }
     }
 
     override suspend fun sendGameButtonEvent(

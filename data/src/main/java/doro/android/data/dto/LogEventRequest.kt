@@ -6,24 +6,12 @@ import doro.android.domain.enums.*
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class CherryLogEventRequest(
-    @SerializedName("log")
-    val log: LogEventRequest
-): Parcelable
-
-@Parcelize
-data class CherryStreamingLogEventRequest(
-    @SerializedName("log")
-    val log: CherryStreamingLogEvent
-): Parcelable
-
-@Parcelize
-data class CherryStreamingLogEvent(
+data class CherryAndroidBugEvent(
     @SerializedName("message")
     val message: String,
     @SerializedName("type")
-    val type: String = "captured_video",
-): Parcelable
+    val type: String,
+) : Parcelable
 
 @Parcelize
 data class LogEventRequest(
@@ -32,15 +20,14 @@ data class LogEventRequest(
     @SerializedName("action")
     val action: CherryAction,
     @SerializedName("data")
-    val data: CherryActionData? = null
-): Parcelable
+    val data: CherryActionData? = null,
+) : Parcelable
 
 @Parcelize
 data class ButtonClickData(
     @SerializedName("name")
-    val name: CherryButtonEvent
+    val name: CherryButtonEvent,
 ) : Parcelable, CherryActionData()
-
 
 @Parcelize
 data class GamePingData(
@@ -51,7 +38,7 @@ data class GamePingData(
     @SerializedName("point")
     val point: Int,
     @SerializedName("game")
-    val gameName: String
+    val gameName: String,
 ) : Parcelable, CherryActionData()
 
 @Parcelize
