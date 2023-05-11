@@ -6,6 +6,18 @@ import doro.android.domain.enums.*
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
+data class CherryLogEventRequest(
+    @SerializedName("log")
+    val log: LogEventRequest,
+) : Parcelable
+
+@Parcelize
+data class CherryAndroidBugEventRequest(
+    @SerializedName("log")
+    val log: CherryAndroidBugEvent,
+) : Parcelable
+
+@Parcelize
 data class CherryAndroidBugEvent(
     @SerializedName("message")
     val message: String,

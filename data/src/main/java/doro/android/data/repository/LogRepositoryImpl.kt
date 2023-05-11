@@ -1,12 +1,9 @@
 package doro.android.data.repository
 
 import android.util.Log
-import doro.android.core.util.UserHolder
 import doro.android.data.dto.*
 import doro.android.data.service.LogService
-import doro.android.domain.enums.CherryAction
 import doro.android.domain.enums.CherryButtonEvent
-import doro.android.domain.enums.CherryGameButtonName
 import doro.android.domain.enums.CherryUI
 import doro.android.domain.repository.LogRepository
 import kotlinx.coroutines.Dispatchers
@@ -72,7 +69,7 @@ class LogRepositoryImpl @Inject constructor(
                 message = message,
                 type = type,
             )
-            logService.sendStreamingEvent(request)
+            logService.sendStreamingEvent(CherryAndroidBugEventRequest(request))
         } catch (e: Throwable) {
             Log.d(TAG, e.message.orEmpty())
         }
