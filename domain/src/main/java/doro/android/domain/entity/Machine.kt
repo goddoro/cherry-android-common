@@ -10,7 +10,7 @@ data class Machine(
 )
 
 enum class MachineStatus {
-    BROKEN, READY, HOLDING, PLAYING, PENDING, EVENT, SPECIAL_GAME_AUTO, WAIT_TO_HOLDING;
+    BROKEN, READY, HOLDING, PLAYING, PENDING, EVENT, SPECIAL_GAME_AUTO, WAIT_TO_HOLDING, UNDER_MAINTENANCE;
     fun isAvailable() = this == READY
     fun isInGame() = this == HOLDING || this == PLAYING || this == PENDING || this == EVENT || this == SPECIAL_GAME_AUTO
 }
