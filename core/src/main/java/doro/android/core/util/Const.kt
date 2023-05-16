@@ -15,11 +15,11 @@ object Const {
     const val USERNAME_MIN_LENGTH = 4
 }
 
-enum class EndPoint(val url: String, val id: Int, val type: String) {
+enum class EndPoint(val url: String, val id: Int, val nickName: String, val type: String) {
 
-    ASV_DEVELOPER_URL("http://15.165.196.152:3000/", 0, "Develop"),
-    ASV_TEST_URL("http://15.165.196.152:3000/", 4,"Test"),
-    ASV_STAGING_URL("http://15.165.196.152:3000/", 1,"Staging"),
-    ASV_PRODUCTION_URL("http://15.165.196.152:3000/", 2,"Production"),
-    LOG_SERVER_URL("http://13.124.181.184:3000/", 3,"Log")
+    ASV_DEVELOPER_URL("http://15.165.196.152:3000/", 0, "APPLE","Develop"),
+    ASV_TEST_URL("http://15.165.196.152:3000/", 4,"BANANA", "Test"),
+    ASV_STAGING_URL("http://15.165.196.152:3000/", 1,"CARROT","Staging"),
+    ASV_PRODUCTION_URL("http://15.165.196.152:3000/", 2,"DURIAN","Production"),
+    LOG_SERVER_URL("http://13.124.181.184:3000/", 3,"EGG","Log")
 }
