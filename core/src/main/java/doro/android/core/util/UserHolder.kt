@@ -61,6 +61,11 @@ class UserHolder @Inject constructor(
             ?: EndPoint.ASV_STAGING_URL.url
     }
 
+    fun getCurrentServerSocketUrl(): String {
+        return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_SOCKET_URL)
+            ?: EndPoint.ASV_STAGING_URL.socketUrl
+    }
+
     fun getCurrentServerType(): String {
         return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_SERVER_TYPE)
             ?: EndPoint.ASV_STAGING_URL.nickName
@@ -76,6 +81,11 @@ class UserHolder @Inject constructor(
             PrefKeys.Session.FILE_NAME,
             PrefKeys.Session.KEY_SERVER_TYPE,
             endPoint.nickName
+        )
+        prefUtil.setString(
+            PrefKeys.Session.FILE_NAME,
+            PrefKeys.Session.KEY_SOCKET_URL,
+            endPoint.socketUrl
         )
     }
 }

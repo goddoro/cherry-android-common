@@ -11,5 +11,6 @@ object PrefKeys {
         const val KEY_UUID = "uuid"
         const val KEY_SERVER_END_POINT = "key_server_end_point"
         const val KEY_SERVER_TYPE = "key_server_type"
+        const val KEY_SOCKET_URL = "key_socket_url"
     }
 }
