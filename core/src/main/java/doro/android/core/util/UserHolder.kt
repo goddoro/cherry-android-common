@@ -58,12 +58,12 @@ class UserHolder @Inject constructor(
 
     fun getCurrentServerEndPoint(): String {
         return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_SERVER_END_POINT)
-            ?: EndPoint.ASV_DEVELOPER_URL.url
+            ?: EndPoint.ASV_STAGING_URL.url
     }
 
     fun getCurrentServerType(): String {
         return prefUtil.getString(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_SERVER_TYPE)
-            ?: EndPoint.ASV_DEVELOPER_URL.nickName
+            ?: EndPoint.ASV_STAGING_URL.nickName
     }
 
     fun setCurrentServerEndPoint(endPoint: EndPoint) {
