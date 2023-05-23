@@ -85,7 +85,7 @@ class CherryInterceptor @Inject constructor(
             .header("x-cherry-client", "android_" + userHolder.getUserType())
             .header(
                 "x-cherry-version",
-                context.packageManager.getPackageInfo(context.packageName, 0).versionName,
+                "1.0.0"
             )
             .build()
         return chain.proceed(request)
