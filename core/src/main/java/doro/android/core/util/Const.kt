@@ -17,9 +17,9 @@ object Const {
 
 enum class EndPoint(val url: String, val id: Int, val nickName: String, val type: String) {
 
-    ASV_DEVELOPER_URL("http://15.165.196.152:3000/", 0, "APPLE","Develop"),
-    ASV_TEST_URL("http://15.165.196.152:3000/", 4,"BANANA", "Test"),
-    ASV_STAGING_URL("http://15.165.196.152:3000/", 1,"CARROT","Staging"),
-    ASV_PRODUCTION_URL("http://15.165.196.152:3000/", 2,"DURIAN","Production"),
-    LOG_SERVER_URL("http://13.124.181.184:3000/", 3,"EGG","Log")
+    ASV_DEVELOPER_URL("http://15.165.196.152:3000/", 0, "APPLE", "Develop(EC2)"),
+    ASV_TEST_URL("http://15.165.196.152:3000/", 4, "BANANA", "Test(Physical Server)"),
+    ASV_STAGING_URL("http://13.251.118.100:3000/", 1, "CARROT", "Staging(EC2)"),
+    ASV_PRODUCTION_URL("http://15.165.196.152:3000/", 2, "DURIAN", "Production"),
+    LOG_SERVER_URL("http://13.124.181.184:3000/", 3, "EGG", "Log")
 }
