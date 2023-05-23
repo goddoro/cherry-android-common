@@ -20,7 +20,7 @@ data class UserPointRequestResponse(
     @SerializedName("status")
     val status: PointRequestStatus,
     @SerializedName("createdAt")
-    val createdAt: String,
+    val createdAt: String? = null,
     @SerializedName("money")
     val money: Int,
     @SerializedName("type")
@@ -31,7 +31,7 @@ data class UserPointRequestResponse(
         agent = agent.toDomain(),
         point = point,
         status = status,
-        createdAt = createdAt,
+        createdAt = createdAt.orEmpty(),
         money = money,
         type = type,
         user = user.toDomain(),
