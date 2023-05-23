@@ -33,6 +33,8 @@ class UserHolder @Inject constructor(
 
     fun clearUser() {
         prefUtil.remove(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_ID)
+        prefUtil.remove(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_TOKEN)
+        prefUtil.remove(PrefKeys.Session.FILE_NAME, PrefKeys.Session.KEY_USER_EMAIL)
     }
 
     fun getUserType(): String {
