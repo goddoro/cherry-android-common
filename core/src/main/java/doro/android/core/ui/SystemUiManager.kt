@@ -5,6 +5,7 @@ import android.view.WindowManager
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import javax.inject.Inject
 
 interface SystemUiManager {
     fun show()
@@ -12,7 +13,7 @@ interface SystemUiManager {
     fun keepOnScreen()
 }
 
-class ActivitySystemUiManager(
+class ActivitySystemUiManager @Inject constructor(
     activity: Activity
 ) : SystemUiManager {
 
