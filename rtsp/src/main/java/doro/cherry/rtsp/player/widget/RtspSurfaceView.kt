@@ -18,8 +18,7 @@ import doro.cherry.rtsp.utils.NetUtils
 import java.net.Socket
 import java.util.concurrent.atomic.AtomicBoolean
 
-
-open class RtspSurfaceView: SurfaceView {
+open class RtspSurfaceView : SurfaceView {
 
     var debug: Boolean = false
 
@@ -30,10 +29,10 @@ open class RtspSurfaceView: SurfaceView {
     private var requestVideo = true
     private var requestAudio = true
     private var rtspThread: RtspThread? = null
-    private var videoFrameQueue = FrameQueue("video",60000) {
+    private var videoFrameQueue = FrameQueue("video", 60) {
         onRtspFrameQueueError(it)
     }
-    private var audioFrameQueue = FrameQueue("audio", 60000) {
+    private var audioFrameQueue = FrameQueue("audio", 60) {
         onRtspFrameQueueError(it)
     }
     var videoDecodeThread: VideoDecodeThread? = null
@@ -41,7 +40,7 @@ open class RtspSurfaceView: SurfaceView {
     private var surfaceWidth = 960
     private var surfaceHeight = 540
     private var statusListener: RtspStatusListener? = null
-    private var errorListener: RtspErrorListener?= null
+    private var errorListener: RtspErrorListener? = null
     private val uiHandler = Handler(Looper.getMainLooper())
     private var videoMimeType: String = "video/avc"
     private var audioMimeType: String = ""
@@ -63,8 +62,11 @@ open class RtspSurfaceView: SurfaceView {
     var videoFrameCount = 0
     var audioFrameCount = 0
 
-    fun getVideoFrameQueue() = this.videoFrameQueue
+    /**
+     * For Debug
+     */
 
+    fun getVideoFrameQueue() = this.videoFrameQueue
     fun getAudioFrameQueue() = this.audioFrameQueue
 
     interface RtspStatusListener {
@@ -81,7 +83,7 @@ open class RtspSurfaceView: SurfaceView {
         fun onVideDecoderError(message: String)
     }
 
-    private val proxyClientListener = object: RtspClient.RtspClientListener {
+    private val proxyClientListener = object : RtspClient.RtspClientListener {
 
         override fun onRtspConnecting() {
             if (DEBUG) Log.v(TAG, "onRtspConnecting()")
@@ -115,7 +117,7 @@ open class RtspSurfaceView: SurfaceView {
                     if (DEBUG) Log.d(TAG, "RTSP SPS and PPS NAL units missed in SDP")
                 }
             }
-            if ( rtspConnected != 0 && surfaceCreated != 0) {
+            if (rtspConnected != 0 && surfaceCreated != 0) {
                 videoStart()
             }
             if (sdpInfo.audioTrack != null) {
@@ -172,7 +174,7 @@ open class RtspSurfaceView: SurfaceView {
         }
     }
 
-    private fun videoStart(){
+    private fun videoStart() {
         videoStart = ++currentOrder
         if (videoMimeType.isNotEmpty() && surface != null) {
             firstFrameRendered = false
@@ -183,7 +185,13 @@ open class RtspSurfaceView: SurfaceView {
                 }
             Log.i(TAG, "Starting video decoder with mime type \"$videoMimeType\"")
             videoDecodeThread = VideoDecodeThread(
-                surface!!, videoMimeType, surfaceWidth, surfaceHeight, videoFrameQueue, onFrameRenderedListener) {
+                surface!!,
+                videoMimeType,
+                surfaceWidth,
+                surfaceHeight,
+                videoFrameQueue,
+                onFrameRenderedListener
+            ) {
                 onRtspVideoDecoderError(it)
             }
             videoDecodeThread!!.name = "RTSP video thread [${getUriName()}]"
@@ -195,19 +203,23 @@ open class RtspSurfaceView: SurfaceView {
         if (audioMimeType.isNotEmpty() /*&& checkAudio!!.isChecked*/) {
             Log.i(TAG, "Starting audio decoder with mime type \"$audioMimeType\"")
             audioDecodeThread = AudioDecodeThread(
-                audioMimeType, audioSampleRate, audioChannelCount, audioCodecConfig, audioFrameQueue)
+                audioMimeType,
+                audioSampleRate,
+                audioChannelCount,
+                audioCodecConfig,
+                audioFrameQueue
+            )
             audioDecodeThread!!.name = "RTSP audio thread [${getUriName()}]"
             audioDecodeThread!!.start()
         }
-
     }
 
-   private val surfaceCallback = object: SurfaceHolder.Callback {
+    private val surfaceCallback = object : SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
             surfaceCreated = ++currentOrder
             if (DEBUG) Log.v(TAG, "surfaceCreated()")
             surface = holder.surface
-            if ( rtspConnected != 0 && surfaceCreated != 0) {
+            if (rtspConnected != 0 && surfaceCreated != 0) {
                 videoStart()
             }
         }
@@ -229,7 +241,7 @@ open class RtspSurfaceView: SurfaceView {
         }
     }
 
-    fun getSurfaceIsValid(): Boolean{
+    fun getSurfaceIsValid(): Boolean {
         return surface?.isValid ?: false
     }
 
@@ -281,7 +293,7 @@ open class RtspSurfaceView: SurfaceView {
         return rtspThread != null
     }
 
-    inner class RtspThread: Thread() {
+    inner class RtspThread : Thread() {
         private var rtspStopped: AtomicBoolean = AtomicBoolean(false)
 
         fun stopAsync() {
@@ -295,12 +307,13 @@ open class RtspSurfaceView: SurfaceView {
             onRtspClientStarted()
             val port = if (uri.port == -1) DEFAULT_RTSP_PORT else uri.port
             try {
-                if (DEBUG) Log.d(TAG, "Connecting to ${uri.host.toString()}:$port...")
+                if (DEBUG) Log.d(TAG, "Connecting to ${uri.host}:$port...")
 
-                val socket: Socket = if (uri.scheme?.lowercase() == "rtsps")
+                val socket: Socket = if (uri.scheme?.lowercase() == "rtsps") {
                     NetUtils.createSslSocketAndConnect(uri.host.toString(), port, 5000)
-                else
+                } else {
                     NetUtils.createSocketAndConnect(uri.host.toString(), port, 5000)
+                }
 
                 // Blocking call until stopped variable is true or connection failed
                 val rtspClient = RtspClient.Builder(socket, uri.toString(), rtspStopped, proxyClientListener)
@@ -311,7 +324,6 @@ open class RtspSurfaceView: SurfaceView {
                     .withCredentials(username, password)
                     .build()
                 rtspClient.execute()
-
 
                 NetUtils.closeSocket(socket)
             } catch (e: Exception) {
@@ -326,7 +338,7 @@ open class RtspSurfaceView: SurfaceView {
         this.statusListener = listener
     }
 
-    fun setErrorListener(listener: RtspErrorListener){
+    fun setErrorListener(listener: RtspErrorListener) {
         if (DEBUG) Log.v(TAG, "setErrorListener")
         this.errorListener = listener
     }
@@ -353,14 +365,14 @@ open class RtspSurfaceView: SurfaceView {
 
     private fun getUriName(): String {
         val port = if (uri.port == -1) DEFAULT_RTSP_PORT else uri.port
-        return "${uri.host.toString()}:$port"
+        return "${uri.host}:$port"
     }
 
-    private fun onRtspFrameQueueError(message: String){
+    private fun onRtspFrameQueueError(message: String) {
         errorListener?.onFrameQueueError(message)
     }
 
-    private fun onRtspVideoDecoderError(error: String){
+    private fun onRtspVideoDecoderError(error: String) {
         errorListener?.onVideDecoderError(error)
     }
 
@@ -369,5 +381,4 @@ open class RtspSurfaceView: SurfaceView {
         private const val DEBUG = false
         private const val DEFAULT_RTSP_PORT = 554
     }
-
 }

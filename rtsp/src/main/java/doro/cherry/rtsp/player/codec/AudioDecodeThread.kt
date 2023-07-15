@@ -4,12 +4,12 @@ import android.media.*
 import android.util.Log
 import java.nio.ByteBuffer
 
-class AudioDecodeThread (
-        private val mimeType: String,
-        private val sampleRate: Int,
-        private val channelCount: Int,
-        private val codecConfig: ByteArray?,
-        private val audioFrameQueue: FrameQueue
+class AudioDecodeThread(
+    private val mimeType: String,
+    private val sampleRate: Int,
+    private val channelCount: Int,
+    private val codecConfig: ByteArray?,
+    private val audioFrameQueue: FrameQueue
 ) : Thread() {
 
     private var isRunning = true
@@ -42,18 +42,19 @@ class AudioDecodeThread (
         val bufferSize = AudioTrack.getMinBufferSize(sampleRate, outChannel, outAudio)
 //      Log.i(TAG, "sampleRate: $sampleRate, bufferSize: $bufferSize".format(sampleRate, bufferSize))
         val audioTrack = AudioTrack(
-                AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                        .build(),
-                AudioFormat.Builder()
-                        .setEncoding(outAudio)
-                        .setChannelMask(outChannel)
-                        .setSampleRate(sampleRate)
-                        .build(),
-                bufferSize,
-                AudioTrack.MODE_STREAM,
-                0)
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build(),
+            AudioFormat.Builder()
+                .setEncoding(outAudio)
+                .setChannelMask(outChannel)
+                .setSampleRate(sampleRate)
+                .build(),
+            bufferSize,
+            AudioTrack.MODE_STREAM,
+            0
+        )
         audioTrack.play()
 
         val bufferInfo = MediaCodec.BufferInfo()
@@ -163,10 +164,8 @@ class AudioDecodeThread (
             extraDataAac = extraDataAac or (channels shl 3)
             val extraData = ByteArray(2)
             extraData[0] = (extraDataAac and 0xff00 shr 8).toByte() // high byte
-            extraData[1] = (extraDataAac and 0xff).toByte()         // low byte
+            extraData[1] = (extraDataAac and 0xff).toByte() // low byte
             return extraData
         }
     }
-
 }
-
