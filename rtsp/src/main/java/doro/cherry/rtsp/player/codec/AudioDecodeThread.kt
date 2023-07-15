@@ -115,6 +115,7 @@ class AudioDecodeThread(
                                 audioTrack.write(chunk, 0, chunk.size)
                             }
                             decoder.releaseOutputBuffer(outIndex, false)
+                            dequeueOutputBufferCount = 0
                             releaseOutputBufferCount = bufferInfo.size
                         }
                     }
