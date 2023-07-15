@@ -62,12 +62,20 @@ open class RtspSurfaceView : SurfaceView {
     var videoFrameCount = 0
     var audioFrameCount = 0
 
+    var videoCodec: String = ""
+    var audioCodec: String = ""
+
     /**
      * For Debug
      */
 
     fun getVideoFrameQueue() = this.videoFrameQueue
     fun getAudioFrameQueue() = this.audioFrameQueue
+
+    fun getVideoCodec() = this.videoCodec
+    fun getAudioCodec() = this.audioCodec
+    fun getVideoMimeType() = this.videoMimeType
+    fun getAudioMimeType() = this.audioMimeType
 
     interface RtspStatusListener {
         fun onRtspStatusConnecting()
@@ -98,11 +106,20 @@ open class RtspSurfaceView : SurfaceView {
             if (sdpInfo.videoTrack != null) {
                 videoFrameQueue.clear()
                 when (sdpInfo.videoTrack?.videoCodec) {
-                    RtspClient.VIDEO_CODEC_H264 -> videoMimeType = "video/avc"
-                    RtspClient.VIDEO_CODEC_H265 -> videoMimeType = "video/hevc"
+                    RtspClient.VIDEO_CODEC_H264 -> {
+                        videoMimeType = "video/avc"
+                        videoCodec = "H.264"
+                    }
+                    RtspClient.VIDEO_CODEC_H265 -> {
+                        videoMimeType = "video/hevc"
+                        videoCodec = "H.265"
+                    }
                 }
                 when (sdpInfo.audioTrack?.audioCodec) {
-                    RtspClient.AUDIO_CODEC_AAC -> audioMimeType = "audio/mp4a-latm"
+                    RtspClient.AUDIO_CODEC_AAC -> {
+                        audioMimeType = "audio/mp4a-latm"
+                        audioCodec = "AAC"
+                    }
                 }
                 val sps: ByteArray? = sdpInfo.videoTrack?.sps
                 val pps: ByteArray? = sdpInfo.videoTrack?.pps
