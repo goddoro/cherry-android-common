@@ -14,7 +14,6 @@ class AudioDecodeThread(
 
     private var isRunning = true
     var dequeueInputBufferCount = 0
-    var queueInputBufferCount = 0
     var dequeueOutputBufferCount = 0
     var releaseOutputBufferCount = 0
 
@@ -64,7 +63,6 @@ class AudioDecodeThread(
         val bufferInfo = MediaCodec.BufferInfo()
         while (isRunning) {
             val inIndex: Int = decoder.dequeueInputBuffer(10000L)
-            dequeueInputBufferCount++
             if (inIndex >= 0) {
                 // fill inputBuffers[inputBufferIndex] with valid data
                 var byteBuffer: ByteBuffer?
@@ -90,6 +88,7 @@ class AudioDecodeThread(
                         byteBuffer?.put(audioFrame.data, audioFrame.offset, audioFrame.length)
                         decoder.queueInputBuffer(inIndex, audioFrame.offset, audioFrame.length, audioFrame.timestamp, 0)
                     }
+                    dequeueInputBufferCount = audioFrame?.length ?: 0
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -100,7 +99,7 @@ class AudioDecodeThread(
 //                Log.w(TAG, "outIndex: ${outIndex}")
                 if (!isRunning) break
                 val outIndex = decoder.dequeueOutputBuffer(bufferInfo, 10000L)
-                dequeueOutputBufferCount++
+                dequeueOutputBufferCount = bufferInfo.size
                 when (outIndex) {
                     MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> Log.d(TAG, "Decoder format changed: ${decoder.outputFormat}")
                     MediaCodec.INFO_TRY_AGAIN_LATER -> if (DEBUG) Log.d(TAG, "No output from decoder available")
@@ -116,6 +115,7 @@ class AudioDecodeThread(
                                 audioTrack.write(chunk, 0, chunk.size)
                             }
                             decoder.releaseOutputBuffer(outIndex, false)
+                            releaseOutputBufferCount = bufferInfo.size
                         }
                     }
                 }
