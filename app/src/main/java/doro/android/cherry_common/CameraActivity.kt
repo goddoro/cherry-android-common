@@ -197,7 +197,6 @@ private fun RtspClientScreen(
         audioQueueSize.value = rtspClientView.getAudioFrameQueue().getQueueSize()
         dequeueInputBufferCount.value =
             rtspClientView.videoDecodeThread?.dequeueInputBufferCount ?: 0
-        queueInputBufferCount.value = rtspClientView.videoDecodeThread?.queueInputBufferCount ?: 0
         dequeueOutputBufferCount.value =
             rtspClientView.videoDecodeThread?.dequeueOutputBufferCount ?: 0
         releaseOutputBufferCount.value =
