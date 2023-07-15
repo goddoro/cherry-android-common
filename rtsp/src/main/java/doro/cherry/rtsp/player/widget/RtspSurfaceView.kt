@@ -62,8 +62,8 @@ open class RtspSurfaceView : SurfaceView {
     var videoFrameCount = 0
     var audioFrameCount = 0
 
-    var videoCodec: String = ""
-    var audioCodec: String = ""
+    private var videoCodec: String = ""
+    private var audioCodec: String = ""
 
     /**
      * For Debug
