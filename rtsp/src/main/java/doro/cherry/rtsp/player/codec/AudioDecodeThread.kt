@@ -61,87 +61,103 @@ class AudioDecodeThread(
         audioTrack.play()
 
         val bufferInfo = MediaCodec.BufferInfo()
-        while (isRunning) {
-            val inIndex: Int = decoder.dequeueInputBuffer(10000L)
-            if (inIndex >= 0) {
-                // fill inputBuffers[inputBufferIndex] with valid data
-                var byteBuffer: ByteBuffer?
-                try {
-                    byteBuffer = decoder.getInputBuffer(inIndex)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    break
-                }
-                byteBuffer?.rewind()
+        synchronized(this) {
+            while (isRunning) {
+                val inIndex: Int = decoder.dequeueInputBuffer(10000L)
+                if (inIndex >= 0) {
+                    // fill inputBuffers[inputBufferIndex] with valid data
+                    var byteBuffer: ByteBuffer?
+                    try {
+                        byteBuffer = decoder.getInputBuffer(inIndex)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        break
+                    }
+                    byteBuffer?.rewind()
 
-                // Preventing BufferOverflowException
+                    // Preventing BufferOverflowException
 //              if (length > byteBuffer.limit()) throw DecoderFatalException("Error")
 
-                val audioFrame: FrameQueue.Frame?
-                try {
-                    audioFrame = audioFrameQueue.pop()
-                    if (audioFrame == null) {
-                        Log.d(TAG, "Empty audio frame")
-                        // Release input buffer
-                        decoder.queueInputBuffer(inIndex, 0, 0, 0L, 0)
-                    } else {
-                        byteBuffer?.put(audioFrame.data, audioFrame.offset, audioFrame.length)
-                        decoder.queueInputBuffer(inIndex, audioFrame.offset, audioFrame.length, audioFrame.timestamp, 0)
+                    val audioFrame: FrameQueue.Frame?
+                    try {
+                        audioFrame = audioFrameQueue.pop()
+                        if (audioFrame == null) {
+                            Log.d(TAG, "Empty audio frame")
+                            // Release input buffer
+                            decoder.queueInputBuffer(inIndex, 0, 0, 0L, 0)
+                        } else {
+                            byteBuffer?.put(audioFrame.data, audioFrame.offset, audioFrame.length)
+                            decoder.queueInputBuffer(
+                                inIndex,
+                                audioFrame.offset,
+                                audioFrame.length,
+                                audioFrame.timestamp,
+                                0
+                            )
+                        }
+                        dequeueInputBufferCount = audioFrame?.length ?: 0
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                    dequeueInputBufferCount = audioFrame?.length ?: 0
+                }
+//            Log.i(TAG, "inIndex: ${inIndex}")
+
+                try {
+//                Log.w(TAG, "outIndex: ${outIndex}")
+                    if (!isRunning) break
+                    val outIndex = decoder.dequeueOutputBuffer(bufferInfo, 10000L)
+                    dequeueOutputBufferCount = bufferInfo.size
+                    when (outIndex) {
+                        MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> Log.d(
+                            TAG,
+                            "Decoder format changed: ${decoder.outputFormat}"
+                        )
+
+                        MediaCodec.INFO_TRY_AGAIN_LATER -> if (DEBUG) Log.d(
+                            TAG,
+                            "No output from decoder available"
+                        )
+
+                        else -> {
+                            if (outIndex >= 0) {
+                                val byteBuffer: ByteBuffer? = decoder.getOutputBuffer(outIndex)
+
+                                val chunk = ByteArray(bufferInfo.size)
+                                byteBuffer?.get(chunk)
+                                byteBuffer?.clear()
+
+                                if (chunk.isNotEmpty()) {
+                                    audioTrack.write(chunk, 0, chunk.size)
+                                }
+                                decoder.releaseOutputBuffer(outIndex, false)
+                                dequeueOutputBufferCount = 0
+                                releaseOutputBufferCount = bufferInfo.size
+                            }
+                        }
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
+
+                // All decoded frames have been rendered, we can stop playing now
+                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                    Log.d(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM")
+                    break
+                }
             }
-//            Log.i(TAG, "inIndex: ${inIndex}")
+            audioTrack.flush()
+            audioTrack.release()
 
             try {
-//                Log.w(TAG, "outIndex: ${outIndex}")
-                if (!isRunning) break
-                val outIndex = decoder.dequeueOutputBuffer(bufferInfo, 10000L)
-                dequeueOutputBufferCount = bufferInfo.size
-                when (outIndex) {
-                    MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> Log.d(TAG, "Decoder format changed: ${decoder.outputFormat}")
-                    MediaCodec.INFO_TRY_AGAIN_LATER -> if (DEBUG) Log.d(TAG, "No output from decoder available")
-                    else -> {
-                        if (outIndex >= 0) {
-                            val byteBuffer: ByteBuffer? = decoder.getOutputBuffer(outIndex)
-
-                            val chunk = ByteArray(bufferInfo.size)
-                            byteBuffer?.get(chunk)
-                            byteBuffer?.clear()
-
-                            if (chunk.isNotEmpty()) {
-                                audioTrack.write(chunk, 0, chunk.size)
-                            }
-                            decoder.releaseOutputBuffer(outIndex, false)
-                            dequeueOutputBufferCount = 0
-                            releaseOutputBufferCount = bufferInfo.size
-                        }
-                    }
-                }
+                decoder.stop()
+                decoder.release()
+            } catch (e: InterruptedException) {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-
-            // All decoded frames have been rendered, we can stop playing now
-            if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
-                Log.d(TAG, "OutputBuffer BUFFER_FLAG_END_OF_STREAM")
-                break
-            }
+            audioFrameQueue.clear()
+            if (DEBUG) Log.d(TAG, "$name stopped")
         }
-        audioTrack.flush()
-        audioTrack.release()
-
-        try {
-            decoder.stop()
-            decoder.release()
-        } catch (e: InterruptedException) {
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        audioFrameQueue.clear()
-        if (DEBUG) Log.d(TAG, "$name stopped")
     }
 
     companion object {
