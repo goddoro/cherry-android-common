@@ -65,6 +65,9 @@ open class RtspSurfaceView : SurfaceView {
     private var videoCodec: String = ""
     private var audioCodec: String = ""
 
+    private var currentVideoTimeStamp: Long = 0L
+    private var currentAudioTimeStamp: Long = 0L
+
     /**
      * For Debug
      */
@@ -76,6 +79,9 @@ open class RtspSurfaceView : SurfaceView {
     fun getAudioCodec() = this.audioCodec
     fun getVideoMimeType() = this.videoMimeType
     fun getAudioMimeType() = this.audioMimeType
+
+    fun getCurrentVideoTimeStamp() = this.currentVideoTimeStamp
+    fun getCurrentAudioTimeStamp() = this.currentAudioTimeStamp
 
     interface RtspStatusListener {
         fun onRtspStatusConnecting()
@@ -157,6 +163,7 @@ open class RtspSurfaceView : SurfaceView {
             if (length > 0) {
                 videoFrameCount++
                 videoFrameQueue.push(FrameQueue.Frame(data, offset, length, timestamp))
+                currentVideoTimeStamp = timestamp
             }
         }
 
@@ -164,6 +171,7 @@ open class RtspSurfaceView : SurfaceView {
             if (length > 0) {
                 audioFrameCount++
                 audioFrameQueue.push(FrameQueue.Frame(data, offset, length, timestamp))
+                currentAudioTimeStamp = timestamp
             }
         }
 
