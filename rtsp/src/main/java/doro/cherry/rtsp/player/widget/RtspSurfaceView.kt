@@ -36,7 +36,7 @@ open class RtspSurfaceView : SurfaceView {
         onRtspFrameQueueError(it)
     }
     var videoDecodeThread: VideoDecodeThread? = null
-    private var audioDecodeThread: AudioDecodeThread? = null
+    var audioDecodeThread: AudioDecodeThread? = null
     private var surfaceWidth = 960
     private var surfaceHeight = 540
     private var statusListener: RtspStatusListener? = null
