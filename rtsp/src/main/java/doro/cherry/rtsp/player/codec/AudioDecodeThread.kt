@@ -13,6 +13,10 @@ class AudioDecodeThread(
 ) : Thread() {
 
     private var isRunning = true
+    var dequeueInputBufferCount = 0
+    var queueInputBufferCount = 0
+    var dequeueOutputBufferCount = 0
+    var releaseOutputBufferCount = 0
 
     fun stopAsync() {
         if (DEBUG) Log.v(TAG, "stopAsync()")
@@ -60,6 +64,7 @@ class AudioDecodeThread(
         val bufferInfo = MediaCodec.BufferInfo()
         while (isRunning) {
             val inIndex: Int = decoder.dequeueInputBuffer(10000L)
+            dequeueInputBufferCount++
             if (inIndex >= 0) {
                 // fill inputBuffers[inputBufferIndex] with valid data
                 var byteBuffer: ByteBuffer?
@@ -94,7 +99,9 @@ class AudioDecodeThread(
             try {
 //                Log.w(TAG, "outIndex: ${outIndex}")
                 if (!isRunning) break
-                when (val outIndex = decoder.dequeueOutputBuffer(bufferInfo, 10000L)) {
+                val outIndex = decoder.dequeueOutputBuffer(bufferInfo, 10000L)
+                dequeueOutputBufferCount++
+                when (outIndex) {
                     MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> Log.d(TAG, "Decoder format changed: ${decoder.outputFormat}")
                     MediaCodec.INFO_TRY_AGAIN_LATER -> if (DEBUG) Log.d(TAG, "No output from decoder available")
                     else -> {
