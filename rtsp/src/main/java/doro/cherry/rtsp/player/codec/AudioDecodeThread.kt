@@ -131,7 +131,7 @@ class AudioDecodeThread(
                                 }
                                 decoder.releaseOutputBuffer(outIndex, false)
                                 dequeueOutputBufferCount = 0
-                                releaseOutputBufferCount = bufferInfo.size
+                                releaseOutputBufferCount++
                             }
                         }
                     }

@@ -127,7 +127,7 @@ class VideoDecodeThread(
                                 bufferInfo.size != 0 && !exitFlag.get()
                             )
                             dequeueOutputBufferCount = 0
-                            releaseOutputBufferCount = bufferInfo.size
+                            releaseOutputBufferCount++
                         } else {
                             if (DEBUG) Log.d(TAG, "out index is negative value")
                             outIndexNegative++
