@@ -15,7 +15,7 @@ data class UserPointRequest(
 )
 
 enum class PointRequestStatus {
-    REQUESTED, DONE, CANCELLED, ORDER, PAY
+    REQUESTED, DONE, CANCELLED, ORDER, PAY, DEMAND
 }
 
 enum class PointRequestType {
