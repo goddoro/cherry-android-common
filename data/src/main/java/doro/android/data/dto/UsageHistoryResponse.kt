@@ -23,6 +23,8 @@ data class UsageHistoryResponse(
     val game: GameResponse,
     @SerializedName("moneyHistories")
     val moneyHistories: List<MoneyHistoryResponse>?,
+    @SerializedName("user")
+    val user: UserResponse?,
 
 ) : Parcelable {
     fun toDomain(): UsageHistory {
@@ -35,6 +37,7 @@ data class UsageHistoryResponse(
             after = after,
             game = game.toDomain(),
             moneyHistories = moneyHistories?.map { it.toDomain() },
+            user = user?.toDomain()
         )
     }
 }

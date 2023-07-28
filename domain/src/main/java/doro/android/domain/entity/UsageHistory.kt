@@ -9,4 +9,5 @@ data class UsageHistory(
     val after: Int,
     val game: Game,
     val moneyHistories: List<MoneyHistory>?,
+    val user: User? = null
 )
