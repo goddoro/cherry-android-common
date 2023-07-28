@@ -36,7 +36,7 @@ class UserPointRequestRepositoryImpl @Inject constructor(
         userPointRequestService.fetchAgentList(
             startDate = startDate,
             endDate = endDate,
-            userId = 0,
+            userId = null,
             agentId = agentId
         ).toDomain()
     }
