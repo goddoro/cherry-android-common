@@ -9,6 +9,7 @@ data class UserPointRequest(
     val status: PointRequestStatus,
     val user: User,
     val createdAt: String,
+    val updatedAt: String,
     val money: Int,
     val type: PointRequestType
 )

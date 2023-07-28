@@ -13,6 +13,14 @@ interface UserPointRequestService {
         @Query("agentId") agentId: Int?
     ): PointRequestsResponse
 
+    @GET("/user-point-request/agent")
+    suspend fun fetchAgentList(
+        @Query("startDate") startDate: String,
+        @Query("endDate") endDate: String,
+        @Query("userId") userId: Int?,
+        @Query("agentId") agentId: Int?
+    ): UserPointRequestListResponse
+
     @PATCH("/user-point-request/carry")
     suspend fun carry(@Body body: UserPointRequestCarryRequest): EmptyResponse
 

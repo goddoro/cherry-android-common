@@ -3,6 +3,7 @@ package doro.android.data.repository
 import doro.android.data.dto.CreatePointRequest
 import doro.android.data.dto.UserPointRequestCarryRequest
 import doro.android.data.service.UserPointRequestService
+import doro.android.domain.entity.AgentPointRequest
 import doro.android.domain.entity.PointRequestType
 import doro.android.domain.entity.UserPointRequest
 import doro.android.domain.repository.UserPointRequestRepository
@@ -25,6 +26,19 @@ class UserPointRequestRepositoryImpl @Inject constructor(
             userId = userId,
             agentId = agentId
         ).userPointRequests.map { it.toDomain() }
+    }
+
+    override suspend fun findAgentList(
+        startDate: String,
+        endDate: String,
+        agentId: Int?
+    ): AgentPointRequest = withContext(Dispatchers.IO){
+        userPointRequestService.fetchAgentList(
+            startDate = startDate,
+            endDate = endDate,
+            userId = 0,
+            agentId = agentId
+        ).toDomain()
     }
 
     override suspend fun findOne(id: Int): UserPointRequest = withContext(Dispatchers.IO) {

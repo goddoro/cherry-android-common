@@ -21,6 +21,8 @@ data class UserPointRequestResponse(
     val status: PointRequestStatus,
     @SerializedName("createdAt")
     val createdAt: String? = null,
+    @SerializedName("updatedAt")
+    val updatedAt: String? = null,
     @SerializedName("money")
     val money: Int,
     @SerializedName("type")
@@ -32,8 +34,9 @@ data class UserPointRequestResponse(
         point = point,
         status = status,
         createdAt = createdAt.orEmpty(),
+        updatedAt = updatedAt.orEmpty(),
         money = money,
         type = type,
-        user = user.toDomain(),
+        user = user.toDomain()
     )
 }
