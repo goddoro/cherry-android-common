@@ -11,13 +11,13 @@ data class UserPointRequestListResponse(
     val userPointRequests: UserPointList? = null,
     @SerializedName("remainRequests")
     val remainRequests: RemainRequests
-): Parcelable {
+) : Parcelable {
     fun toDomain(): AgentPointRequest {
         return AgentPointRequest(
             moneyCount = remainRequests.money,
             pointCount = remainRequests.point,
-            moneyRequests = userPointRequests?.moneyRequests?.map { it.toDomain()} ?: listOf(),
-            pointRequests = userPointRequests?.pointRequests?.map { it.toDomain()} ?: listOf()
+            moneyRequests = userPointRequests?.moneyRequests?.map { it.toDomain() } ?: listOf(),
+            pointRequests = userPointRequests?.pointRequests?.map { it.toDomain() } ?: listOf()
         )
     }
 }
@@ -28,7 +28,7 @@ data class UserPointList(
     val pointRequests: List<UserPointRequestResponse>,
     @SerializedName("money")
     val moneyRequests: List<UserPointRequestResponse>
-): Parcelable
+) : Parcelable
 
 @Parcelize
 data class RemainRequests(
@@ -36,4 +36,4 @@ data class RemainRequests(
     val point: Int,
     @SerializedName("money")
     val money: Int
-): Parcelable
+) : Parcelable
