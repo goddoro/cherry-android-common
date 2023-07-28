@@ -23,6 +23,9 @@ data class CommissionResponse(
 
     @SerializedName("credit")
     val credit: Int,
+
+    @SerializedName("createdAt")
+    val createdAt: String?
 ) : Parcelable {
     fun toDomain(): Commission {
         return Commission(
@@ -31,6 +34,7 @@ data class CommissionResponse(
             status = this.status,
             agent = this.agent?.toDomain(),
             credit = this.credit,
+            createdAt = this.createdAt.orEmpty()
         )
     }
 }
