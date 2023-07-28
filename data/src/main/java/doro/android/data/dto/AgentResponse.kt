@@ -15,6 +15,8 @@ data class AgentResponse(
     val email: String,
     @SerializedName("clients")
     val clients: List<UserResponse>? = null,
+    @SerializedName("point")
+    val point: Int?
 ): Parcelable{
     fun toDomain(): Agent {
         return Agent(
@@ -22,6 +24,7 @@ data class AgentResponse(
             name = this.name,
             email = this.email,
             clients = this.clients?.map { it.toDomain() },
+            point = point ?: 0,
         )
     }
 }

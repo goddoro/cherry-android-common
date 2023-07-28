@@ -5,4 +5,5 @@ data class Agent(
     val name: String,
     val email: String,
     val clients: List<User>? = null,
+    val point: Int
 )
