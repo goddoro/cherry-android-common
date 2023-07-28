@@ -21,4 +21,5 @@ interface UserPointRequestRepository {
     suspend fun findOne(id: Int): UserPointRequest
     suspend fun carry(id: Int): Boolean
     suspend fun create(agentName: String, point: Int, money: Int, type: PointRequestType): Boolean
+    suspend fun updateStatus(id: Int, status: String)
 }

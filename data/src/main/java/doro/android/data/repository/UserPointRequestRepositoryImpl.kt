@@ -2,6 +2,7 @@ package doro.android.data.repository
 
 import doro.android.data.dto.CreatePointRequest
 import doro.android.data.dto.UserPointRequestCarryRequest
+import doro.android.data.dto.UserPointRequestStatusUpdateRequest
 import doro.android.data.service.UserPointRequestService
 import doro.android.domain.entity.AgentPointRequest
 import doro.android.domain.entity.PointRequestType
@@ -14,6 +15,14 @@ import javax.inject.Inject
 class UserPointRequestRepositoryImpl @Inject constructor(
     private val userPointRequestService: UserPointRequestService,
 ) : UserPointRequestRepository {
+
+    override suspend fun updateStatus(
+        id: Int,
+        status: String
+    ): Unit = withContext(Dispatchers.IO) {
+        val request = UserPointRequestStatusUpdateRequest(pointRequestId = id, status = status)
+        userPointRequestService.updateStatus(request)
+    }
     override suspend fun findList(
         startDate: String,
         endDate: String,

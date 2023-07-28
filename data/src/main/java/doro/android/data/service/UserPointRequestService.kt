@@ -24,6 +24,9 @@ interface UserPointRequestService {
     @PATCH("/user-point-request/carry")
     suspend fun carry(@Body body: UserPointRequestCarryRequest): EmptyResponse
 
+    @PATCH("/user-point-request/status")
+    suspend fun updateStatus(@Body body: UserPointRequestStatusUpdateRequest): EmptyResponse
+
     @POST("/user-point-request")
     suspend fun create(@Body body: CreatePointRequest): EmptyResponse
 
