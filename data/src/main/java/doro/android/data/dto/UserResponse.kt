@@ -18,7 +18,7 @@ data class UserResponse(
     val username: String,
 
     @SerializedName("point")
-    val point: Int,
+    val point: Int?,
 
     @SerializedName("agent")
     val agent: AgentResponse?,
@@ -32,7 +32,7 @@ data class UserResponse(
             id = id,
             email = email,
             username = username,
-            point = point,
+            point = point ?: 0,
             token = token.orEmpty(),
             agent = agent?.toDomain(),
             role = role ?: UserRole.player,
