@@ -20,7 +20,7 @@ data class UsageHistoryResponse(
     @SerializedName("after")
     val after: Int,
     @SerializedName("game")
-    val game: GameResponse,
+    val game: GameResponse?,
     @SerializedName("moneyHistories")
     val moneyHistories: List<MoneyHistoryResponse>?,
     @SerializedName("user")
@@ -35,7 +35,7 @@ data class UsageHistoryResponse(
             endTime = endTime,
             before = before,
             after = after,
-            game = game.toDomain(),
+            game = game?.toDomain(),
             moneyHistories = moneyHistories?.map { it.toDomain() },
             user = user?.toDomain()
         )

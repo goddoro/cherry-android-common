@@ -7,7 +7,7 @@ data class UsageHistory(
     val endTime: String?,
     val before: Int,
     val after: Int,
-    val game: Game,
+    val game: Game?,
     val moneyHistories: List<MoneyHistory>?,
     val user: User? = null
 )
