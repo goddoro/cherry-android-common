@@ -8,7 +8,8 @@ data class Commission(
     val status: CommissionStatus,
     val createdAt: String,
     val updatedAt: String,
-    val user: User?
+    val user: User?,
+    val usageHistory: UsageHistory?
 )
 
 enum class CommissionStatus {
