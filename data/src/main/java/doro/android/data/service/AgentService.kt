@@ -1,7 +1,11 @@
 package doro.android.data.service
 
+import com.google.gson.annotations.SerializedName
 import doro.android.data.dto.AgentResponse
+import doro.android.data.dto.EmptyResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -11,4 +15,20 @@ interface AgentService {
 
     @GET("/agents/{id}")
     suspend fun findOne(@Path("id") id: Int): AgentResponse
+
+    @POST("/sign-up-agent")
+    suspend fun signUp(@Body request: AgentSignUpRequest): EmptyResponse
 }
+
+data class AgentSignUpRequest(
+    @SerializedName("name")
+    val nickName: String,
+    @SerializedName("password")
+    val password: String,
+    @SerializedName("telephone")
+    val telephone: String,
+    @SerializedName("location")
+    val location: String,
+    @SerializedName("email")
+    val email: String
+)
