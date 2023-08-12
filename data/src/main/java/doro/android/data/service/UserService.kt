@@ -10,14 +10,14 @@ interface UserService {
     @GET("/users/search")
     suspend fun search(@Query("query") query: String): UserSearchResponse?
 
-    @PATCH("users/{id}")
+    @PUT("users/{id}")
     @FormUrlEncoded
     suspend fun update(
         @Path("id") userId: Int,
         @FieldMap params: HashMap<String, Any>
     ): UserResponse
 
-    @PATCH("/users/{id}/point")
+    @PUT("/users/{id}/point")
     suspend fun updatePoint(
         @Path("id") userId: Int,
         @Body body: UserPointUpdateRequest
@@ -29,7 +29,7 @@ interface UserService {
     @DELETE("/users")
     suspend fun signOut(): EmptyResponse
 
-    @PATCH("/users/{id}/agent")
+    @PUT("/users/{id}/agent")
     suspend fun updateAgent(@Path("id") userId: Int, @Body updateAgentRequest: UpdateAgentRequest): UserResponse
 
 }

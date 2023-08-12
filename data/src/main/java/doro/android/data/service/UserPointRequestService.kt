@@ -21,10 +21,10 @@ interface UserPointRequestService {
         @Query("agentId") agentId: Int?
     ): UserPointRequestListResponse
 
-    @PATCH("/user-point-request/carry")
+    @PUT("/user-point-request/carry")
     suspend fun carry(@Body body: UserPointRequestCarryRequest): EmptyResponse
 
-    @PATCH("/user-point-request/status")
+    @PUT("/user-point-request/status")
     suspend fun updateStatus(@Body body: UserPointRequestStatusUpdateRequest): EmptyResponse
 
     @POST("/user-point-request")
