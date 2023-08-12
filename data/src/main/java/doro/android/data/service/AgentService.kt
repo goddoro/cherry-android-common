@@ -16,7 +16,7 @@ interface AgentService {
     @GET("/agents/{id}")
     suspend fun findOne(@Path("id") id: Int): AgentResponse
 
-    @POST("/sign-up-agent")
+    @POST("/auth/sign-up-agent")
     suspend fun signUp(@Body request: AgentSignUpRequest): EmptyResponse
 }
 
