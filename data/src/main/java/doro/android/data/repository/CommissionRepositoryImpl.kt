@@ -13,8 +13,8 @@ class CommissionRepositoryImpl @Inject constructor(
     private val commissionService: CommissionService,
 ) : CommissionRepository {
 
-    override suspend fun fetch(agentId: Int?): List<Commission> = withContext(Dispatchers.IO) {
-        commissionService.fetch(agentId).commissions.map { it.toDomain() }
+    override suspend fun fetch(agentId: Int?, startDate: String, endDate: String): List<Commission> = withContext(Dispatchers.IO) {
+        commissionService.fetch(agentId, startDate, endDate).commissions.map { it.toDomain() }
     }
 
     override suspend fun approve(status: CommissionStatus, ids: List<Int>): Boolean =

@@ -11,9 +11,12 @@ import retrofit2.http.Query
 
 interface CommissionService {
     @GET("/commission")
-    suspend fun fetch(@Query("agentId") agentId: Int?): CommissionListResponse
+    suspend fun fetch(
+        @Query("agentId") agentId: Int?,
+        @Query("startDate") startDate: String,
+        @Query("endDate") endDate: String
+    ): CommissionListResponse
 
     @PUT("/commission")
     suspend fun approve(@Body body: CommissionApproveRequest): EmptyResponse
-
 }
