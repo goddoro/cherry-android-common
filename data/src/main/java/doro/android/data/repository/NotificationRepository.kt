@@ -12,6 +12,6 @@ class NotificationRepositoryImpl @Inject constructor(
 ) : NotificationRepository {
 
     override suspend fun findList(): List<Notification> = withContext(Dispatchers.IO) {
-        notificationService.findList().notifications.map { it.toDomain() }
+        notificationService.findList(1).notifications.map { it.toDomain() }
     }
 }

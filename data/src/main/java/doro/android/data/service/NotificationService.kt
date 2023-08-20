@@ -5,10 +5,11 @@ import com.google.gson.annotations.SerializedName
 import doro.android.domain.entity.Notification
 import kotlinx.parcelize.Parcelize
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface NotificationService {
     @GET("/notifications")
-    suspend fun findList(): NotificationListResponse
+    suspend fun findList(@Query("page") page: Int): NotificationListResponse
 }
 
 @Parcelize
