@@ -10,7 +10,7 @@ object Const {
 
     const val MACHINE_GAME_EXTRA = "MACHINE_GAME_EXTRA"
 
-    const val PASSWORD_MIN_LENGTH = 10
+    const val PASSWORD_MIN_LENGTH = 6
 
     const val USERNAME_MIN_LENGTH = 4
 }

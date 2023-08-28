@@ -65,8 +65,8 @@ class AudioDecodeThread(
             while (isRunning) {
                 var inIndex = -1
                 try {
-                    inIndex  = decoder.dequeueInputBuffer(10000L)
-                } catch(e: Throwable) {
+                    inIndex = decoder.dequeueInputBuffer(10000L)
+                } catch (e: Throwable) {
                     Log.d(TAG, e.message.orEmpty())
                 }
                 if (inIndex >= 0) {
