@@ -63,7 +63,12 @@ class AudioDecodeThread(
         val bufferInfo = MediaCodec.BufferInfo()
         synchronized(this) {
             while (isRunning) {
-                val inIndex: Int = decoder.dequeueInputBuffer(10000L)
+                var inIndex = -1
+                try {
+                    inIndex  = decoder.dequeueInputBuffer(10000L)
+                } catch(e: Throwable) {
+                    Log.d(TAG, e.message.orEmpty())
+                }
                 if (inIndex >= 0) {
                     // fill inputBuffers[inputBufferIndex] with valid data
                     var byteBuffer: ByteBuffer?
