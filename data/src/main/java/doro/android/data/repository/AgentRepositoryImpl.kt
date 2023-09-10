@@ -2,6 +2,7 @@ package doro.android.data.repository
 
 import doro.android.data.service.AgentService
 import doro.android.data.service.AgentSignUpRequest
+import doro.android.data.service.TokenUpdateRequest
 import doro.android.domain.entity.Agent
 import doro.android.domain.repository.AgentRepository
 import kotlinx.coroutines.Dispatchers
@@ -36,5 +37,13 @@ class AgentRepositoryImpl @Inject constructor(
             location = location
         )
         agentService.signUp(request)
+    }
+
+    override suspend fun updateToken(id: Int, token: String): Boolean = withContext(Dispatchers.IO){
+        val request = TokenUpdateRequest(
+            agentId = id,
+            token = token
+        )
+        agentService.updateToken(request).success
     }
 }

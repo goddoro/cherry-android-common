@@ -1,7 +1,5 @@
 package doro.android.cherry_common
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,20 +7,21 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import doro.cherry.rtsp.player.codec.FrameQueue
 import doro.cherry.rtsp.player.widget.RtspSurfaceView
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.util.VLCVideoLayout
-
 
 @AndroidEntryPoint
 class CameraActivity : ComponentActivity() {
@@ -33,17 +32,14 @@ class CameraActivity : ComponentActivity() {
         val videoUrl = intent?.getStringExtra("KEY_VIDEO_URL") ?: ""
         val password = intent?.getStringExtra("KEY_PASSWORD") ?: ""
         setContent {
-
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-
-                //VLCPlayer(videoUrl = videoUrl )
+                // VLCPlayer(videoUrl = videoUrl )
                 RtspClientScreen(videoUrl = videoUrl, password = password)
             }
         }
     }
-
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
@@ -96,39 +92,37 @@ fun VLCPlayer(
         mMediaPlayer!!.play()
     }
 
-
     DisposableEffect(
         AndroidView(
-            modifier = modifier, factory = {
-                mVideoLayout
-            }
+            modifier = modifier,
+            factory = {
+                    mVideoLayout
+                }
         ) {
-
-        }) {
+        }
+    ) {
         onDispose {
             mMediaPlayer?.release()
         }
     }
-
-
 }
-
 
 @Composable
 private fun RtspClientScreen(
     videoUrl: String,
     password: String,
 ) {
-
     val TAG = "RtspClientScreen"
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val isProgressVisible = remember { mutableStateOf(true) }
 
     val rtspClientView = remember {
         RtspSurfaceView(context).apply {
-
             setStatusListener(object : RtspSurfaceView.RtspStatusListener {
                 override fun onRtspFirstFrameRendered() {
                     Log.d(TAG, "onRtspFirstFrameRendered")
+                    isProgressVisible.value = false
                 }
 
                 override fun onRtspStatusConnected() {
@@ -141,10 +135,20 @@ private fun RtspClientScreen(
 
                 override fun onRtspStatusDisconnected() {
                     Log.d(TAG, "onRtspStatusDisconnected")
+
+//                    coroutineScope.launch {
+//                        delay(1000)
+//                        stop()
+//                        val uri = android.net.Uri.parse(videoUrl)
+//                        val username = "admin"
+//                        init(uri, username, password)
+//                        start(requestVideo = true, requestAudio = true)
+//                    }
                 }
 
                 override fun onRtspStatusFailed(message: String?) {
                     Log.d(TAG, "onRtspStatusFailed $message")
+                    isProgressVisible.value = true
                 }
 
                 override fun onRtspStatusFailedUnauthorized() {
@@ -163,7 +167,6 @@ private fun RtspClientScreen(
             start(requestVideo = true, requestAudio = true)
         }
     }
-
 
     val count = remember { mutableStateOf((0)) }
     val codecName = remember { mutableStateOf("") }
@@ -191,7 +194,6 @@ private fun RtspClientScreen(
     val onFrameRender = remember { mutableStateOf(0L) }
 
     LaunchedEffect(count.value) {
-        codecName.value = rtspClientView.videoDecodeThread?.decoder?.codecInfo?.name.orEmpty()
         mimeType.value = rtspClientView.videoDecodeThread?.mimeType.toString()
         videoQueueSize.value = rtspClientView.getVideoFrameQueue().getQueueSize()
         audioQueueSize.value = rtspClientView.getAudioFrameQueue().getQueueSize()
@@ -221,15 +223,24 @@ private fun RtspClientScreen(
         count.value = count.value + 1
     }
 
-
     DisposableEffect(
-        AndroidView(
-            factory = {
-                rtspClientView
+        Box {
+            AndroidView(
+                factory = {
+                    rtspClientView
+                }
+            ) {
             }
-        ) {
-
-        }) {
+            if (isProgressVisible.value) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+    ) {
         onDispose {
             rtspClientView.stop()
         }

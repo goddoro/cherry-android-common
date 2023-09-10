@@ -13,4 +13,9 @@ interface AgentRepository {
         telephone: String,
         location: String
     )
+
+    suspend fun updateToken(
+        id: Int,
+        token: String
+    ): Boolean
 }

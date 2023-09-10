@@ -5,6 +5,7 @@ import doro.android.data.dto.AgentResponse
 import doro.android.data.dto.EmptyResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -18,6 +19,9 @@ interface AgentService {
 
     @POST("/auth/sign-up-agent")
     suspend fun signUp(@Body request: AgentSignUpRequest): EmptyResponse
+
+    @PATCH("/agents/{id}")
+    suspend fun updateToken(@Body request: TokenUpdateRequest): EmptyResponse
 }
 
 data class AgentSignUpRequest(
@@ -31,4 +35,11 @@ data class AgentSignUpRequest(
     val location: String,
     @SerializedName("email")
     val email: String
+)
+
+data class TokenUpdateRequest(
+    @SerializedName("agentId")
+    val agentId: Int,
+    @SerializedName("token")
+    val token: String
 )
