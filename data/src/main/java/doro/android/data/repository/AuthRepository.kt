@@ -15,7 +15,7 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
 
     override suspend fun signIn(email: String, password: String): User = withContext(Dispatchers.IO) {
-        val params = hashMapOf<String,String>().apply {
+        val params = hashMapOf<String, String>().apply {
             this["email"] = email
             this["password"] = password
         }
@@ -23,37 +23,42 @@ class AuthRepositoryImpl @Inject constructor(
         signInResponse.user.toDomain(signInResponse.token)
     }
 
-    override suspend fun signUp(email: String, password: String, username: String): Boolean = withContext(Dispatchers.IO){
-        val params = hashMapOf<String,String>().apply {
+    override suspend fun signUp(
+        email: String,
+        password: String,
+        username: String,
+        agentName: String
+    ): Boolean = withContext(Dispatchers.IO) {
+        val params = hashMapOf<String, String>().apply {
             this["email"] = email
             this["password"] = password
             this["username"] = username
+            this["agentName"] = agentName
         }
         authService.signUp(params).success
     }
 
-    override suspend fun sendVerifyCodeEmail(email: String): Boolean = withContext(Dispatchers.IO){
-        val params = hashMapOf<String,String>().apply {
+    override suspend fun sendVerifyCodeEmail(email: String): Boolean = withContext(Dispatchers.IO) {
+        val params = hashMapOf<String, String>().apply {
             this["email"] = email
         }
         authService.sendVerifyCodeEmail(params).success
     }
 
-    override suspend fun checkValidationCode(code: String): Boolean = withContext(Dispatchers.IO){
-        val params = hashMapOf<String,String>().apply {
+    override suspend fun checkValidationCode(code: String): Boolean = withContext(Dispatchers.IO) {
+        val params = hashMapOf<String, String>().apply {
             this["code"] = code
         }
         authService.verifyCode(params).success
     }
 
-    override suspend fun agentSignIn(name: String, password: String): Agent = withContext(Dispatchers.IO){
-        val params = hashMapOf<String,String>().apply {
+    override suspend fun agentSignIn(name: String, password: String): Agent = withContext(Dispatchers.IO) {
+        val params = hashMapOf<String, String>().apply {
             this["name"] = name
             this["password"] = password
         }
         authService.agentSignIn(params).agent.toDomain()
     }
-
 
     override fun logout() {
         userHolder.clearUser()
